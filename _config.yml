@@ -1,1 +1,4 @@
+navbar: true
 theme: jekyll-theme-midnight
+title: Coding Circle Docs
+description: "Life is short...learn Python!" -- Leonhard Euler
