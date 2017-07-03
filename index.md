@@ -1,4 +1,2 @@
-# Getting Set Up to Code With Python
-## Does GitHub like Markdown Better?
-
-Just a test.
+# CodingCircle Summer 2017 Documentation
+## [Getting Set Up](setup)
