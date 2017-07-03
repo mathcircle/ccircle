@@ -10,6 +10,6 @@
    up a GitHub account.  You can also use this guide to install Python on your
    computer at home!
 
-### * [1 : Installing Python](setup1)
-### * [2 : Installing PyCharm](setup2)
-### * [3 : Registering for GitHub](setup3)
+### [1 : Installing Python](setup1)
+### [2 : Installing PyCharm](setup2)
+### [3 : Registering for GitHub](setup3)
