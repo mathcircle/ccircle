@@ -38,9 +38,9 @@ while window.isOpen():
 
   window.clear(0.1, 0.1, 0.1)
 
-  if ccircle.keydown('W'): player.y -= speed * dt
-  if ccircle.keydown('S'): player.y += speed * dt
-  if ccircle.keydown('space'):
+  if ccircle.isKeyDown('W'): player.y -= speed * dt
+  if ccircle.isKeyDown('S'): player.y += speed * dt
+  if ccircle.isMouseDown('right'):
     bullets.append(Bullet(player.x + 32, player.y))
 
   for bullet in bullets:

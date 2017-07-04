@@ -2,6 +2,32 @@
 #include <windows.h>
 
 static PyObject*
+ccircle_mousedown ( PyObject* self, PyObject* args )
+{
+  char* button;
+  int vk = -1;
+  if (!PyArg_ParseTuple(args, "s", &button))
+    return 0;
+
+  int len = strlen(button);
+  if (len == 0)
+    return 0;
+  for (int i = 0; i < len; ++i)
+    button[i] = tolower(button[i]);
+
+  if (false) {}
+  else if (strcmp(button, "left") == 0)    vk = 0x01;
+  else if (strcmp(button, "right") == 0)   vk = 0x02;
+  else if (strcmp(button, "middle") == 0)  vk = 0x04;
+  else if (strcmp(button, "x1") == 0)      vk = 0x05;
+  else if (strcmp(button, "x2") == 0)      vk = 0x06;
+  else
+    return 0;
+
+  return PyBool_FromLong(GetAsyncKeyState(vk));
+}
+
+static PyObject*
 ccircle_keydown ( PyObject* self, PyObject* args )
 {
   char* key;
@@ -61,12 +87,17 @@ ccircle_keydown ( PyObject* self, PyObject* args )
   else if (strcmp(key, "up") == 0)          vk = 0x26;
   else if (strcmp(key, "right") == 0)       vk = 0x27;
   else if (strcmp(key, "down") == 0)        vk = 0x28;
+  else
+    return 0;
 
   return PyBool_FromLong(GetAsyncKeyState(vk));
 }
 
 static PyMethodDef functions[] = {
-  { "keydown", (PyCFunction)ccircle_keydown, METH_VARARGS, "Return whether or not the given key is down" },
+  { "isMouseDown", (PyCFunction)ccircle_mousedown, METH_VARARGS,
+    "Return whether or not the given mouse button is down" },
+  { "isKeyDown",   (PyCFunction)ccircle_keydown,   METH_VARARGS,
+    "Return whether or not the given key is down" },
   { 0, 0, 0, 0 },
 };
 
