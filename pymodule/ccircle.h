@@ -1,5 +1,5 @@
-#ifndef CCC_h
-#define CCC_h
+#ifndef CCircle_h
+#define CCircle_h
 
 #include <Python.h>
 #include <stdbool.h>
@@ -10,6 +10,9 @@ typedef unsigned short ushort;
 typedef unsigned int uint;
 typedef unsigned long ulong;
 
-void ccircle_init_window ( PyObject* m );
+void ccircle_init_input  ( PyObject* );
+void ccircle_init_window ( PyObject* );
+
+static void Fatal (cstr s) { }
 
 #endif

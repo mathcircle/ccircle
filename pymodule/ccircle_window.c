@@ -3,10 +3,6 @@
 #include <GL/gl.h>
 #include <stdbool.h>
 
-#pragma comment(lib, "user32.lib")
-#pragma comment(lib, "gdi32.lib")
-#pragma comment(lib, "opengl32.lib")
-
 typedef struct {
   PyObject_HEAD
   HWND hwnd;
@@ -47,8 +43,8 @@ ccircle_window_init ( ccircle_window_t* self, PyObject* args, PyObject* kwds )
 {
   static char* kwlist[] = { "title", "width", "height", "x", "y", 0 };
   cstr title = "CC Window";
-  int x = 16;
-  int y = 16;
+  int x = CW_USEDEFAULT;
+  int y = CW_USEDEFAULT;
   uint sx = 640;
   uint sy = 480;
 
@@ -60,26 +56,18 @@ ccircle_window_init ( ccircle_window_t* self, PyObject* args, PyObject* kwds )
   /* Register window class. */
   if (firstTime) {
     firstTime = false;
-    uint style =
-      CS_VREDRAW |
-      CS_HREDRAW |
-      CS_OWNDC;
-
-    WNDCLASSEX wc;
+    WNDCLASSEX wc = { 0 };
     wc.cbSize        = sizeof(WNDCLASSEX);
-    wc.style         = style;
-    wc.lpfnWndProc   = ccircle_window_proc;
-    wc.cbClsExtra    = 0;
-    wc.cbWndExtra    = 0;
+    wc.style         = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
+    wc.lpfnWndProc   = (WNDPROC)ccircle_window_proc;
     wc.hInstance     = hinst;
     wc.hIcon         = LoadIcon(0, IDI_WINLOGO);
     wc.hCursor       = LoadCursor(0, IDC_ARROW);
-    wc.hbrBackground = 0;
-    wc.lpszMenuName  = 0;
     wc.lpszClassName = "CCircleWindow";
     wc.hIconSm       = LoadIcon(0, IDI_APPLICATION);
+
     if (!RegisterClassEx(&wc)) {
-      // Fatal("Window class registration failed");
+      Fatal("Failed to register window class");
       return -1;
     }
   }
@@ -96,7 +84,7 @@ ccircle_window_init ( ccircle_window_t* self, PyObject* args, PyObject* kwds )
       0, 0, hinst, 0);
 
     if (!hwnd) {
-      // Fatal("Window Creation Failed");
+      Fatal("Failed to create window");
       return -1;
     }
   }
@@ -108,23 +96,19 @@ ccircle_window_init ( ccircle_window_t* self, PyObject* args, PyObject* kwds )
       PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER,
       PFD_TYPE_RGBA,
       24,
-      0, 0, 0, 0, 0, 0,
-      0,
-      0,
-      0,
-      0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0,
       32,
       0,
       0,
       PFD_MAIN_PLANE,
-      0,
-      0, 0, 0,
+      0, 0, 0, 0,
     };
 
     HDC dc = GetDC(hwnd);
     int iPF = ChoosePixelFormat(dc, &pfd);
     if (!SetPixelFormat(dc, iPF, &pfd)) {
-      // Fatal("Failed to set window pixel format");
+      Fatal("Failed to set window pixel format");
       return -1;
     }
     ReleaseDC(hwnd, dc);
@@ -135,11 +119,11 @@ ccircle_window_init ( ccircle_window_t* self, PyObject* args, PyObject* kwds )
     HDC dc = GetDC(hwnd);
     hglc = wglCreateContext(dc);
     if (!hglc) {
-      // Fatal("Failed to create GL context");
+      Fatal("Failed to create WGL context");
       return -1;
     }
     if (!wglMakeCurrent(dc, hglc)) {
-      // Fatal("Failed to activate GL context");
+      Fatal("Failed to make WGL context current");
       return -1;
     }
     ReleaseDC(hwnd, dc);
@@ -332,8 +316,9 @@ static PyTypeObject ccircle_window_pytype = {
 void ccircle_init_window ( PyObject* m )
 {
   ccircle_window_pytype.tp_new = PyType_GenericNew;
-  if (PyType_Ready(&ccircle_window_pytype) < 0)
-    return 0;
+  if (PyType_Ready(&ccircle_window_pytype) < 0) {
+    Fatal("Failed to create Window type");
+  }
 
   Py_INCREF(m);
   PyModule_AddObject(m, "Window", (PyObject*)&ccircle_window_pytype);
