@@ -183,6 +183,44 @@ ccircle_window_clear ( ccircle_window_t* self, PyObject* args )
   Py_RETURN_NONE;
 }
 
+/* --- Window::drawCircle --------------------------------------------------- */
+
+const float Tau = 6.28318531f;
+const float Pi  = 3.14159265f;
+const float Pi2 = 1.57079633f;
+const float Pi4 = 0.785398163f;
+const float Pi6 = 0.523598776f;
+
+static PyObject*
+ccircle_window_drawcircle ( ccircle_window_t* self, PyObject* args )
+{
+  float x, y, radius;
+  float r = 1.0f;
+  float g = 1.0f;
+  float b = 1.0f;
+  float a = 1.0f;
+  if (!PyArg_ParseTuple(args, "fff|fffff", &x, &y, &radius, &r, &g, &b, &a))
+    return 0;
+
+  float fv = radius / 4.0f;
+  fv = max(fv, 16.0f);
+  fv = min(fv, 64.0f);
+  int verts = (int)fv;
+  fv = (float)verts;
+
+  glBegin(GL_TRIANGLES);
+  glColor4f(r, g, b, a);
+  for (int i = 0; i < verts; ++i) {
+    float angle1 = Tau * (float)(i + 0) / fv;
+    float angle2 = Tau * (float)(i + 1) / fv;
+    glVertex2f(x, y);
+    glVertex2f(x + radius * cos(angle1), y + radius * sin(angle1));
+    glVertex2f(x + radius * cos(angle2), y + radius * sin(angle2));
+  }
+  glEnd();
+  Py_RETURN_NONE;
+}
+
 /* --- Window::drawLine ----------------------------------------------------- */
 
 static PyObject*
@@ -391,6 +429,8 @@ ccircle_window_update ( ccircle_window_t* self, PyObject* args )
 static PyMethodDef ccircle_window_methods[] = {
   { "clear", (PyCFunction)ccircle_window_clear, METH_VARARGS,
     "Clear the entire window with the given color" },
+  { "drawCircle", (PyCFunction)ccircle_window_drawcircle, METH_VARARGS,
+    "Draw a circle in the window" },
   { "drawLine", (PyCFunction)ccircle_window_drawline, METH_VARARGS,
     "Draw a line in the window" },
   { "drawPoint", (PyCFunction)ccircle_window_drawpoint, METH_VARARGS,

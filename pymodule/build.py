@@ -1,6 +1,6 @@
 from distutils.core import setup, Extension
 
-VERSION = '0.6.0'
+VERSION = '0.6.3'
 
 module_ccircle = Extension(
   'ccircle',

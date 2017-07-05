@@ -61,5 +61,7 @@ while window.isOpen():
     bullet.draw(window)
 
   cat.draw(16, 16, 128, 128)
+  wx, wy = window.getSize()
+  window.drawCircle(wx / 2, wy / 2, abs(wx / 2 - mx), 0.1, 0.5, 1.0)
 
   window.update()
