@@ -185,6 +185,55 @@ ccircle_window_clear ( ccircle_window_t* self, PyObject* args )
   Py_RETURN_NONE;
 }
 
+/* --- Window::drawLine ----------------------------------------------------- */
+
+static PyObject*
+ccircle_window_drawline ( ccircle_window_t* self, PyObject* args )
+{
+  float x1, y1, x2, y2;
+  float w = 2.0f;
+  float r = 1.0f;
+  float g = 1.0f;
+  float b = 1.0f;
+  float a = 1.0f;
+  if (!PyArg_ParseTuple(args, "ffff|fffff", &x1, &y1, &x2, &y2, &w, &r, &g, &b, &a))
+    return 0;
+
+  ccircle_window_setactive(self);
+  glLineWidth(w);
+  glColor4f(r, g, b, a);
+  glBegin(GL_LINES);
+  glVertex2f(x1, y1);
+  glVertex2f(x2, y2);
+  glEnd();
+  Py_RETURN_NONE;
+}
+
+/* --- Window::drawPoint ---------------------------------------------------- */
+
+static PyObject*
+ccircle_window_drawpoint ( ccircle_window_t* self, PyObject* args )
+{
+  float x, y;
+  float s = 2.0f;
+  float r = 1.0f;
+  float g = 1.0f;
+  float b = 1.0f;
+  float a = 1.0f;
+  if (!PyArg_ParseTuple(args, "ff|fffff", &x, &y, &s, &r, &g, &b, &a))
+    return 0;
+
+  ccircle_window_setactive(self);
+  glPointSize(s);
+  glColor4f(r, g, b, a);
+  glBegin(GL_POINTS);
+  glVertex2f(x, y);
+  glEnd();
+  Py_RETURN_NONE;
+}
+
+/* --- Window::drawRect ----------------------------------------------------- */
+
 static PyObject*
 ccircle_window_drawrect ( ccircle_window_t* self, PyObject* args )
 {
@@ -206,6 +255,8 @@ ccircle_window_drawrect ( ccircle_window_t* self, PyObject* args )
   glEnd();
   Py_RETURN_NONE;
 }
+
+/* --- Window::drawTri ------------------------------------------------------ */
 
 static PyObject*
 ccircle_window_drawtri ( ccircle_window_t* self, PyObject* args )
@@ -230,11 +281,15 @@ ccircle_window_drawtri ( ccircle_window_t* self, PyObject* args )
   Py_RETURN_NONE;
 }
 
+/* --- Window::isOpen ------------------------------------------------------- */
+
 static PyObject*
 ccircle_window_isopen ( ccircle_window_t* self, PyObject* args )
 {
   return PyBool_FromLong(self->quit ? 0L : 1L);
 }
+
+/* --- Window::update ------------------------------------------------------- */
 
 static PyObject*
 ccircle_window_update ( ccircle_window_t* self, PyObject* args )
@@ -263,14 +318,20 @@ ccircle_window_update ( ccircle_window_t* self, PyObject* args )
   Py_RETURN_NONE;
 }
 
+/* -------------------------------------------------------------------------- */
+
 static PyMethodDef ccircle_window_methods[] = {
-  { "clear",    (PyCFunction)ccircle_window_clear,    METH_VARARGS, "Clear the entire window with the given color" },
-  { "drawRect", (PyCFunction)ccircle_window_drawrect, METH_VARARGS, "Draw a rectangle in the window" },
-  { "drawTri",  (PyCFunction)ccircle_window_drawtri,  METH_VARARGS, "Draw a triangle in the window" },
-  { "isOpen",   (PyCFunction)ccircle_window_isopen,   METH_NOARGS,  "Return whether or not the window is still open" },
-  { "update",   (PyCFunction)ccircle_window_update,   METH_NOARGS,  "Update the window, causing drawn elements to be shown and pending messages to be processed" },
+  { "clear",     (PyCFunction)ccircle_window_clear,     METH_VARARGS, "Clear the entire window with the given color" },
+  { "drawLine",  (PyCFunction)ccircle_window_drawline,  METH_VARARGS, "Draw a line in the window" },
+  { "drawPoint", (PyCFunction)ccircle_window_drawpoint, METH_VARARGS, "Draw a point in the window" },
+  { "drawRect",  (PyCFunction)ccircle_window_drawrect,  METH_VARARGS, "Draw a rectangle in the window" },
+  { "drawTri",   (PyCFunction)ccircle_window_drawtri,   METH_VARARGS, "Draw a triangle in the window" },
+  { "isOpen",    (PyCFunction)ccircle_window_isopen,    METH_NOARGS,  "Return whether or not the window is still open" },
+  { "update",    (PyCFunction)ccircle_window_update,    METH_NOARGS,  "Update the window, causing drawn elements to be shown and pending messages to be processed" },
   { 0 },
 };
+
+/* -------------------------------------------------------------------------- */
 
 static PyTypeObject ccircle_window_pytype = {
   PyVarObject_HEAD_INIT(0, 0)
@@ -312,6 +373,8 @@ static PyTypeObject ccircle_window_pytype = {
   0,                                  /* tp_alloc */
   0,                                  /* tp_new */
 };
+
+/* -------------------------------------------------------------------------- */
 
 void ccircle_init_window ( PyObject* m )
 {

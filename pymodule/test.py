@@ -7,7 +7,8 @@ class Bullet:
     self.x, self.y = x, y
 
   def draw(self, window):
-    window.drawRect(self.x - 4, self.y - 2, 8, 4, 0.25, 1.0, 0.25)
+    # window.drawLine(self.x - 2, self.y, self.x + 2, self.y, 2, 1, 0, 0.5)
+    window.drawPoint(self.x, self.y, 4, 1, 0, 0.5)
 
   def update(self, dt):
     self.x += 5.0
