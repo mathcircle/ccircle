@@ -281,12 +281,44 @@ ccircle_window_drawtri ( ccircle_window_t* self, PyObject* args )
   Py_RETURN_NONE;
 }
 
+/* --- Window::getMousePos -------------------------------------------------- */
+
+static PyObject*
+ccircle_window_getmousepos ( ccircle_window_t* self, PyObject* args )
+{
+  if (!self) return 0;
+  POINT p;
+  GetCursorPos(&p);
+  ScreenToClient(self->hwnd, &p);
+  return Py_BuildValue("(ii)", p.x, p.y);
+}
+
+/* --- Window::hideMouse ---------------------------------------------------- */
+
+static PyObject*
+ccircle_window_hidemouse ( ccircle_window_t* self, PyObject* args )
+{
+  if (!self) return 0;
+  while (ShowCursor(false) > 0) {}
+  Py_RETURN_NONE;
+}
+
 /* --- Window::isOpen ------------------------------------------------------- */
 
 static PyObject*
 ccircle_window_isopen ( ccircle_window_t* self, PyObject* args )
 {
   return PyBool_FromLong(self->quit ? 0L : 1L);
+}
+
+/* --- Window::showMouse ---------------------------------------------------- */
+
+static PyObject*
+ccircle_window_showmouse ( ccircle_window_t* self, PyObject* args )
+{
+  if (!self) return 0;
+  while (ShowCursor(true) <= 0) {}
+  Py_RETURN_NONE;
 }
 
 /* --- Window::update ------------------------------------------------------- */
@@ -321,13 +353,26 @@ ccircle_window_update ( ccircle_window_t* self, PyObject* args )
 /* -------------------------------------------------------------------------- */
 
 static PyMethodDef ccircle_window_methods[] = {
-  { "clear",     (PyCFunction)ccircle_window_clear,     METH_VARARGS, "Clear the entire window with the given color" },
-  { "drawLine",  (PyCFunction)ccircle_window_drawline,  METH_VARARGS, "Draw a line in the window" },
-  { "drawPoint", (PyCFunction)ccircle_window_drawpoint, METH_VARARGS, "Draw a point in the window" },
-  { "drawRect",  (PyCFunction)ccircle_window_drawrect,  METH_VARARGS, "Draw a rectangle in the window" },
-  { "drawTri",   (PyCFunction)ccircle_window_drawtri,   METH_VARARGS, "Draw a triangle in the window" },
-  { "isOpen",    (PyCFunction)ccircle_window_isopen,    METH_NOARGS,  "Return whether or not the window is still open" },
-  { "update",    (PyCFunction)ccircle_window_update,    METH_NOARGS,  "Update the window, causing drawn elements to be shown and pending messages to be processed" },
+  { "clear", (PyCFunction)ccircle_window_clear, METH_VARARGS,
+    "Clear the entire window with the given color" },
+  { "drawLine", (PyCFunction)ccircle_window_drawline, METH_VARARGS,
+    "Draw a line in the window" },
+  { "drawPoint", (PyCFunction)ccircle_window_drawpoint, METH_VARARGS,
+    "Draw a point in the window" },
+  { "drawRect", (PyCFunction)ccircle_window_drawrect, METH_VARARGS,
+    "Draw a rectangle in the window" },
+  { "drawTri", (PyCFunction)ccircle_window_drawtri, METH_VARARGS,
+    "Draw a triangle in the window" },
+  { "getMousePos", (PyCFunction)ccircle_window_getmousepos, METH_NOARGS,
+    "Get the position of the mouse cursor relative to the window" },
+  { "hideMouse", (PyCFunction)ccircle_window_hidemouse, METH_NOARGS,
+    "Makes the mouse cursor invisible inside the window" },
+  { "isOpen", (PyCFunction)ccircle_window_isopen, METH_NOARGS,
+    "Return whether or not the window is still open" },
+  { "showMouse", (PyCFunction)ccircle_window_showmouse, METH_NOARGS,
+    "Makes the mouse cursor visible inside the window" },
+  { "update", (PyCFunction)ccircle_window_update, METH_NOARGS,
+    "Update the window, causing drawn elements to be shown" },
   { 0 },
 };
 

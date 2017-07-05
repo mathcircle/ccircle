@@ -29,6 +29,8 @@ window = ccircle.Window(
   width = 800,
   height = 800)
 
+window.hideMouse()
+
 player = Player(64, 128, 0.1, 0.5, 1.0)
 enemy = Player(640, 128, 1.0, 0.0, 0.2)
 bullets = []
@@ -46,6 +48,9 @@ while window.isOpen():
 
   for bullet in bullets:
     bullet.update(dt)
+
+  mx, my = window.getMousePos()
+  window.drawPoint(mx, my, 8)
 
   player.draw(window)
   enemy.draw(window)
