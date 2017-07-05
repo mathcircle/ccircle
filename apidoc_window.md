@@ -11,13 +11,15 @@ as well as drawing things inside windows.
 ## `window.clear(r, g, b) -> None`
   Clear the entire window with the color `(r, g, b)`
 
+## `window.drawCircle(x, y, radius, [r=1.0, g=1.0, b=1.0]) -> None`
+  Draw a centered at `(x, y)` with radius `radius` and color `(r, g, b)`
+
 ## `window.drawLine(x1, y1, x2, y2, [width=2.0, r=1.0, g=1.0, b=1.0]) -> None`
-  Draw a line within the window from `(x1, y1)` to `(x2, y2)` that is `width`
+  Draw a from `(x1, y1)` to `(x2, y2)` that is `width`
   pixels thick and has color `(r, g, b)`
 
 ## `window.drawPoint(x, y, [size=2.0, r=1.0, g=1.0, b=1.0]) -> None`
-  Draw a point at `(x, y)` in the window that is `size` pixels wide and has
-  color `(r, g, b)`
+  Draw a point at `(x, y)` that is `size` pixels wide and has color `(r, g, b)`
 
 ## `window.drawRect(x, y, width, height, [r=1.0, g=1.0, b=1.0]) -> None`
   Draw a rectangle starting at `(x, y)` (the top-left corner) that is `width`
@@ -41,6 +43,13 @@ as well as drawing things inside windows.
   Return whether or not the window is still open; use `while window.isOpen():`
   to loop until the window close button is clicked or the window is otherwise
   killed
+
+## `window.setSize(width, height) -> None`
+  Set the size of the window to `width` x `height`
+
+## `window.showMouse() -> None`
+  Set the mouse cursor to be visible when inside the window (this is the default
+  behavior)
 
 ## `window.toggleMaximized() -> None`
   Toggle the maximized state of the window; windows are not maximized by default,
