@@ -20,3 +20,6 @@
 # Additional Resources:
 ### [Pulling Saved Code From GitHub On a Different Computer](newClone)
 ### [Pulling Staff Changes to ccircle](pull)
+
+# CCircle Python Module Reference
+### [ccircle.Window](apidoc_window)
