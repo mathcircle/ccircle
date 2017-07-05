@@ -57,4 +57,4 @@ class Solution:
     # Your solution!
     def moveTowardPizza(self, cat):
         # Wheeeee!
-        cat.turnLeft()
+        # pretend solution
