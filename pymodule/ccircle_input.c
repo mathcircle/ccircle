@@ -1,31 +1,7 @@
 #include "ccircle.h"
 #include <windows.h>
 
-static PyObject*
-ccircle_mousedown ( PyObject* self, PyObject* args )
-{
-  char* button;
-  int vk = -1;
-  if (!PyArg_ParseTuple(args, "s", &button))
-    return 0;
-
-  int len = strlen(button);
-  if (len == 0)
-    return 0;
-  for (int i = 0; i < len; ++i)
-    button[i] = tolower(button[i]);
-
-  if (false) {}
-  else if (strcmp(button, "left") == 0)    vk = 0x01;
-  else if (strcmp(button, "right") == 0)   vk = 0x02;
-  else if (strcmp(button, "middle") == 0)  vk = 0x04;
-  else if (strcmp(button, "x1") == 0)      vk = 0x05;
-  else if (strcmp(button, "x2") == 0)      vk = 0x06;
-  else
-    return 0;
-
-  return PyBool_FromLong(GetAsyncKeyState(vk));
-}
+/* --- isKeyDown ------------------------------------------------------------ */
 
 static PyObject*
 ccircle_keydown ( PyObject* self, PyObject* args )
@@ -92,6 +68,36 @@ ccircle_keydown ( PyObject* self, PyObject* args )
 
   return PyBool_FromLong(GetAsyncKeyState(vk));
 }
+
+/* --- isMouseDown ---------------------------------------------------------- */
+
+static PyObject*
+ccircle_mousedown ( PyObject* self, PyObject* args )
+{
+  char* button;
+  int vk = -1;
+  if (!PyArg_ParseTuple(args, "s", &button))
+    return 0;
+
+  int len = strlen(button);
+  if (len == 0)
+    return 0;
+  for (int i = 0; i < len; ++i)
+    button[i] = tolower(button[i]);
+
+  if (false) {}
+  else if (strcmp(button, "left") == 0)    vk = 0x01;
+  else if (strcmp(button, "right") == 0)   vk = 0x02;
+  else if (strcmp(button, "middle") == 0)  vk = 0x04;
+  else if (strcmp(button, "x1") == 0)      vk = 0x05;
+  else if (strcmp(button, "x2") == 0)      vk = 0x06;
+  else
+    return 0;
+
+  return PyBool_FromLong(GetAsyncKeyState(vk));
+}
+
+/* -------------------------------------------------------------------------- */
 
 static PyMethodDef functions[] = {
   { "isMouseDown", (PyCFunction)ccircle_mousedown, METH_VARARGS,

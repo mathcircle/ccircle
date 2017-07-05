@@ -1,3 +1,8 @@
+import os
+d = os.path.dirname(os.path.realpath(__file__))
+import sys
+sys.path.append(d + '\\dist')
+
 import ccircle
 import random
 from math import *
@@ -29,11 +34,11 @@ window = ccircle.Window(
   width = 800,
   height = 800)
 
-window.hideMouse()
-
 player = Player(64, 128, 0.1, 0.5, 1.0)
 enemy = Player(640, 128, 1.0, 0.0, 0.2)
 bullets = []
+
+window.toggleMaximized()
 
 while window.isOpen():
   speed = 2

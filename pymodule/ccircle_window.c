@@ -171,6 +171,8 @@ ccircle_window_setactive ( ccircle_window_t* self )
   }
 }
 
+/* --- Window::clear -------------------------------------------------------- */
+
 static PyObject*
 ccircle_window_clear ( ccircle_window_t* self, PyObject* args )
 {
@@ -293,6 +295,17 @@ ccircle_window_getmousepos ( ccircle_window_t* self, PyObject* args )
   return Py_BuildValue("(ii)", p.x, p.y);
 }
 
+/* --- Window::getSize ------------------------------------------------------ */
+
+static PyObject*
+ccircle_window_getsize ( ccircle_window_t* self, PyObject* args )
+{
+  if (!self) return 0;
+  RECT rect;
+  GetClientRect(self->hwnd, &rect);
+  return Py_BuildValue("(ii)", rect.right - rect.left, rect.bottom - rect.top);
+}
+
 /* --- Window::hideMouse ---------------------------------------------------- */
 
 static PyObject*
@@ -311,6 +324,18 @@ ccircle_window_isopen ( ccircle_window_t* self, PyObject* args )
   return PyBool_FromLong(self->quit ? 0L : 1L);
 }
 
+/* --- Window::setSize ------------------------------------------------------ */
+
+static PyObject*
+ccircle_window_setsize ( ccircle_window_t* self, PyObject* args )
+{
+  int sx, sy;
+  if (!PyArg_ParseTuple(args, "ii", &sx, &sy))
+    return 0;
+  SetWindowPos(self->hwnd, 0, 0, 0, sx, sy, SWP_NOMOVE);
+  Py_RETURN_NONE;
+}
+
 /* --- Window::showMouse ---------------------------------------------------- */
 
 static PyObject*
@@ -318,6 +343,21 @@ ccircle_window_showmouse ( ccircle_window_t* self, PyObject* args )
 {
   if (!self) return 0;
   while (ShowCursor(true) <= 0) {}
+  Py_RETURN_NONE;
+}
+
+/* --- Window::toggleMaximized ---------------------------------------------- */
+
+static PyObject*
+ccircle_window_togglemaximized ( ccircle_window_t* self, PyObject* args )
+{
+  if (!self) return 0;
+  WINDOWPLACEMENT wndpl;
+  GetWindowPlacement(self->hwnd, &wndpl);
+  if (wndpl.showCmd == SW_MAXIMIZE)
+    ShowWindow(self->hwnd, SW_RESTORE);
+  else
+    ShowWindow(self->hwnd, SW_MAXIMIZE);
   Py_RETURN_NONE;
 }
 
@@ -365,12 +405,18 @@ static PyMethodDef ccircle_window_methods[] = {
     "Draw a triangle in the window" },
   { "getMousePos", (PyCFunction)ccircle_window_getmousepos, METH_NOARGS,
     "Get the position of the mouse cursor relative to the window" },
+  { "getSize", (PyCFunction)ccircle_window_getsize, METH_NOARGS,
+    "Get the size of window's drawable region" },
   { "hideMouse", (PyCFunction)ccircle_window_hidemouse, METH_NOARGS,
-    "Makes the mouse cursor invisible inside the window" },
+    "Make the mouse cursor invisible inside the window" },
   { "isOpen", (PyCFunction)ccircle_window_isopen, METH_NOARGS,
     "Return whether or not the window is still open" },
+  { "setSize", (PyCFunction)ccircle_window_setsize, METH_VARARGS,
+    "Set the size of the window" },
   { "showMouse", (PyCFunction)ccircle_window_showmouse, METH_NOARGS,
-    "Makes the mouse cursor visible inside the window" },
+    "Make the mouse cursor visible inside the window" },
+  { "toggleMaximized", (PyCFunction)ccircle_window_togglemaximized, METH_NOARGS,
+    "Toggle the window's maximized state" },
   { "update", (PyCFunction)ccircle_window_update, METH_NOARGS,
     "Update the window, causing drawn elements to be shown" },
   { 0 },
