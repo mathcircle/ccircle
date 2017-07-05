@@ -1,12 +1,14 @@
 from distutils.core import setup, Extension
 
-VERSION = '0.5.1'
+VERSION = '0.6.0'
 
 module_ccircle = Extension(
   'ccircle',
 
   sources = [
     'ccircle.c',
+    'ccircle_image.c',
+    'ccircle_image_load.c',
     'ccircle_input.c',
     'ccircle_window.c',
   ],

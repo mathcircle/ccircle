@@ -1,7 +1,4 @@
 #include "ccircle.h"
-#include <windows.h>
-#include <GL/gl.h>
-#include <stdbool.h>
 
 typedef struct {
   PyObject_HEAD
@@ -41,14 +38,13 @@ ccircle_window_proc ( HWND self, UINT msg, WPARAM wp, LPARAM lp )
 static int
 ccircle_window_init ( ccircle_window_t* self, PyObject* args, PyObject* kwds )
 {
-  static char* kwlist[] = { "title", "width", "height", "x", "y", 0 };
   cstr title = "CC Window";
   int x = CW_USEDEFAULT;
   int y = CW_USEDEFAULT;
   uint sx = 640;
   uint sy = 480;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|siiii", kwlist, &title, &sx, &sy, &x, &y))
+  if (!PyArg_ParseTuple(args, "|siiii", &title, &sx, &sy, &x, &y))
     return -1;
 
   HINSTANCE hinst = GetModuleHandle(0);
@@ -467,13 +463,11 @@ static PyTypeObject ccircle_window_pytype = {
 
 /* -------------------------------------------------------------------------- */
 
-void ccircle_init_window ( PyObject* m )
+void ccircle_init_window ( PyObject* self )
 {
   ccircle_window_pytype.tp_new = PyType_GenericNew;
-  if (PyType_Ready(&ccircle_window_pytype) < 0) {
+  if (PyType_Ready(&ccircle_window_pytype) < 0)
     Fatal("Failed to create Window type");
-  }
-
-  Py_INCREF(m);
-  PyModule_AddObject(m, "Window", (PyObject*)&ccircle_window_pytype);
+  Py_INCREF(self);
+  PyModule_AddObject(self, "Window", (PyObject*)&ccircle_window_pytype);
 }

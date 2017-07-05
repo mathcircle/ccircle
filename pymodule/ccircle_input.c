@@ -1,5 +1,4 @@
 #include "ccircle.h"
-#include <windows.h>
 
 /* --- isKeyDown ------------------------------------------------------------ */
 

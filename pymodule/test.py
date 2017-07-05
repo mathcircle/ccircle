@@ -29,10 +29,8 @@ class Player:
       self.x + 16, self.y + 16,
       self.r, self.g, self.b)
 
-window = ccircle.Window(
-  title = 'CCircle Module Test',
-  width = 800,
-  height = 800)
+window = ccircle.Window('CCircle Module Test', 800, 800)
+cat = ccircle.Image('cat.png')
 
 player = Player(64, 128, 0.1, 0.5, 1.0)
 enemy = Player(640, 128, 1.0, 0.0, 0.2)
@@ -61,5 +59,7 @@ while window.isOpen():
   enemy.draw(window)
   for bullet in bullets:
     bullet.draw(window)
+
+  cat.draw(16, 16, 128, 128)
 
   window.update()
