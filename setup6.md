@@ -21,7 +21,7 @@
     ![save03](assets/img/save03.png)
 
 * Before we push to our personal repository, we'll need to create one!
-    Navigate to your [github](www.github.com/new) and verify that your username is the one listed under the "Owner".
+    Navigate to the [Create new repository GitHub page](www.github.com/new) and verify that your username is the one listed under the "Owner".
     Name the repository "ccircle", click the box to "Initialize this repository with a README", then click "Create repository".
    ![save04](assets/img/save04a.png)
 
