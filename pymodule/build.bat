@@ -18,5 +18,6 @@ python build.py bdist_wininst --title="Coding Circle Python Extensions"
 
 if "%INSTALL%"=="1" (
   copy %BUILDPATH%*.pyd %PYPATH%Lib\
+  copy %BUILDPATH%*.pyd dist\
 )
 pause
