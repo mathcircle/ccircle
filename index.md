@@ -16,3 +16,7 @@
 ### [4 : Downloading Git](setup4)
 ### [5 : Pulling the ccircle Git Repository](setup5)
 ### [6 : Saving Code Online Using Git](setup6)
+
+# Additional Resource:
+### [Pulling Saved Code From GitHub On a Different Computer](newClone)
+### [Pulling Staff Changes to ccircle](pull)
