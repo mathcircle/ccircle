@@ -1,5 +1,7 @@
 # CCircle Module Documentation: Window
 
+## [Back to Index](index)
+
 Here you will find functions related to creating and using on-screen windows,
 as well as drawing things inside windows.
 
