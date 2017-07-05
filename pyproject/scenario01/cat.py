@@ -96,15 +96,16 @@ class Handler:
     def isFacingW(self):
         return self.cat.facing == West
 
+    def smellsPizza(self):
+        fx, fy = self._getFacingCell()
+        result = self.world.getCell(fx, fy)
+        return result == CellGoal
+
     def turnLeft(self):
-        if not self._moved:
-            self.cat.facing = (self.cat.facing + 3) % 4
-            self._moved = True
+        self.cat.facing = (self.cat.facing + 3) % 4
 
     def turnRight(self):
-        if not self._moved:
-            self.cat.facing = (self.cat.facing + 1) % 4
-            self._moved = True
+        self.cat.facing = (self.cat.facing + 1) % 4
 
     def walk(self):
         if not self._moved:
@@ -200,11 +201,11 @@ class World:
         self.clear(len(data[0]))
         for y, row in enumerate(data):
             for x, cell in enumerate(row):
-                if cell == 'W':
+                if cell == 'W' or cell == '|' or cell == '+':
                     self.cells[x][y] = CellWall
-                elif cell == 'X':
+                elif cell == 'X' or cell == 'C':
                     self.addObject(Cat(x, y))
-                elif cell == '!':
+                elif cell == '!' or cell == 'P':
                     self.cells[x][y] = CellGoal
                 else:
                     self.cells[x][y] = CellEmpty
