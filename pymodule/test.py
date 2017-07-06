@@ -30,7 +30,8 @@ class Player:
       self.r, self.g, self.b)
 
 window = ccircle.Window('CCircle Module Test', 800, 800)
-cat = ccircle.Image('cat.png')
+cat = ccircle.Image('res/cat.png')
+font = ccircle.Font('res/FiraMono.ttf')
 
 player = Player(64, 128, 0.1, 0.5, 1.0)
 enemy = Player(640, 128, 1.0, 0.0, 0.2)
@@ -61,7 +62,6 @@ while window.isOpen():
     bullet.draw(window)
 
   cat.draw(16, 16, 128, 128)
-  wx, wy = window.getSize()
-  window.drawCircle(wx / 2, wy / 2, abs(wx / 2 - mx), 0.1, 0.5, 1.0)
+  font.draw("I'm a cat! :3", 140, 64 + 32, 32)
 
   window.update()
