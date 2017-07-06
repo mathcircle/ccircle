@@ -83,8 +83,8 @@ class StockMarket:
         stock = self._stocks[sym]
         total = stock.price * quantity
         if total > account.getBalance():
-          raise Exception('Buying %d x %s costs $%.2f, but your account only has $%.2f') % (
-            quantity, sym, total, account.getBalance())
+          raise Exception('Buying %d x %s costs $%.2f, but your account only has $%.2f' % (
+            quantity, sym, total, account.getBalance()))
         account._balance -= total
         account._addShares(sym, quantity)
         account._logAction('BUY  %d x %s @ $%.2f; total = $%.2f' % (quantity, sym, stock.price, total))
@@ -108,8 +108,8 @@ class StockMarket:
         stock = self._stocks[sym]
         total = stock.price * quantity
         if account.getShares(sym) < quantity:
-          raise Exception('Selling %d x %s requires %d shares of %s, but your account only has %d') % (
-            quantity, sym, quantity, sym, account.getShares(sym))
+          raise Exception('Selling %d x %s requires %d shares of %s, but your account only has %d' % (
+            quantity, sym, quantity, sym, account.getShares(sym)))
         account._balance += total
         account._removeShares(sym, quantity)
         account._logAction('SELL %d x %s @ $%.2f; total = $%.2f' % (quantity, sym, stock.price, total))
