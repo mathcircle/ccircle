@@ -39,15 +39,19 @@ static PyObject*
 ccircle_font_draw ( ccircle_font_t* self, PyObject* args )
 {
   cstr text;
-  int x, y;
-  int size = DEFAULT_FONT_SIZE;
+  float fx, fy;
+  float fsize = DEFAULT_FONT_SIZE;
   float r = 1.0f;
   float g = 1.0f;
   float b = 1.0f;
   float a = 1.0f;
   
-  if (!PyArg_ParseTuple(args, "sii|iffff", &text, &x, &y, &size, &r, &g, &b, &a))
+  if (!PyArg_ParseTuple(args, "sff|fffff", &text, &fx, &fy, &fsize, &r, &g, &b, &a))
     return 0;
+
+  int x = (int)fx;
+  int y = (int)fy;
+  int size = (int)fsize;
 
   FT_Set_Pixel_Sizes(self->face, 0, 2 * size);
   FT_GlyphSlot slot = self->face->glyph;
