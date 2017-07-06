@@ -39,6 +39,8 @@ def accountPanel():
     text(fMenu, 'BALANCE', 32, y, 20); y += 25
     text(fMono, '>', 64, y, 20);
     text(fMono, '$%.2f' % account.getBalance(), 90, y, 20, (0.5, 1.0, 0.5)); y += 25
+    text(fMono, '>', 64, y, 20);
+    text(fMono, '$%.2f PPD' % ((account.getBalance() - 1000) / day), 90, y, 20, (0.5, 1.0, 0.5)); y += 25
 
     y += 15
     text(fMenu, 'STOCKS', 32, y, 20); y += 25

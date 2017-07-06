@@ -50,7 +50,7 @@ class Stock:
 
     def _update(self):
         self.history.append(self.price)
-        t = max(0.01, min(1.00, self.chaos))
+        t = max(0.01, min(0.9, self.chaos))
         price = 100.0 * random.uniform(0, 1)
         self.price = (1.0 - t) * self.price + t * price
 
