@@ -7,7 +7,7 @@ trader = solution.StockTrader()
 account, market = problem.create(trader)
 
 window = ccircle.Window('Scenario 2: Beating the Stock Market', 1600, 900, 32, 32)
-#window.toggleMaximized()
+window.toggleMaximized()
 wx, wy = window.getSize()
 
 fMenu = ccircle.Font('../res/NovaFlat.ttf')
