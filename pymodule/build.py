@@ -1,23 +1,29 @@
+import glob
 from distutils.core import setup, Extension
 
-VERSION = '0.6.3'
+VERSION = '0.7.4'
 
+srcList = glob.glob('./src/*.c')
 module_ccircle = Extension(
   'ccircle',
 
-  sources = [
-    'ccircle.c',
-    'ccircle_image.c',
-    'ccircle_image_load.c',
-    'ccircle_input.c',
-    'ccircle_window.c',
+  include_dirs = [
+    './extinclude/',
+    './include/',
   ],
 
   libraries = [
     'gdi32',
     'opengl32',
     'user32',
+    'freetype28MT',
   ],
+
+  library_dirs = [
+    './extlib/',
+  ],
+
+  sources = srcList,
 )
 
 setup(
