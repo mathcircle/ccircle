@@ -19,7 +19,7 @@
 ### [6 : Saving Code Online Using Git](setup6)
 
 # Lab
-### [Python Lists, Functions and Objects](lab03)
+### [Lab 3: Python Lists, Functions and Objects](lab03)
 
 # Git Resources
 ### [Pulling Saved Code From GitHub On a Different Computer](gitNewClone)

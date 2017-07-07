@@ -1,9 +1,11 @@
 # CCircle.Lab.3 : Python Lists, Functions and Objects
 ### Prev -> [CodingCircle Summer 2017 Documentation](index)
 
-## For questions asking you to figure out what is printed when certain code is evaluated, write down your solution to the problem _before_ trying to run the provided code on your computer.
+## Welcome to Lab 3
+For questions asking you to figure out what is printed when certain code is evaluated,
+please write down your solution to the problem _before_ trying to run the provided code on your computer.
 
-# Lists
+## Lists
 1.
     Complete the function below with a single line of code.
 
@@ -93,7 +95,7 @@ Write function `my_zip` that mimics the behavior of `zip`.
 
 
 
-# Functions - Draw an environment diagram!
+## Functions
 1.
     Fill in the blanks in the following function definition for adding a to the absolute value of b, without calling `abs`.
 
@@ -202,7 +204,7 @@ Write function _hailstone(n)_ to print the _hailstone sequence_ starting at n, a
 
 
 
-# Objects
+## Objects
 1.
     Write what is printed when the following code is evaluated.
 
@@ -234,4 +236,5 @@ Write function _hailstone(n)_ to print the _hailstone sequence_ starting at n, a
 
 
 
-## Congratulations, you've completed this lab!
+## Congratulations
+You've completed this lab!
