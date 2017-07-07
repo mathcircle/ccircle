@@ -40,4 +40,4 @@
     Find the folder with your first name and verify the contents of the "\_\_init\_\_.py" file within.
     ![save06](assets/img/save06.png)
 
-### Congratulations, you're done with setup!
+## Congratulations, you're done with setup!
