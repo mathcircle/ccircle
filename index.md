@@ -26,4 +26,5 @@
 ### [Pulling Staff Changes to ccircle](gitPullStaffChanges)
 
 # CCircle Python Module Reference
+### [ccircle.input](apidoc_input)
 ### [ccircle.Window](apidoc_window)
