@@ -63,9 +63,7 @@ as well as drawing things inside windows.
 
   Typical window loops should look like this:
 
-    ```python
     win = ccircle.Window('SuperWindow!!')
     while win.isOpen():
       # Do your drawing and other stuff here!
       win.update()
-    ```
