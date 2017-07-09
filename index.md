@@ -20,6 +20,7 @@
 
 # Lab
 ### [Lab 3: Python Lists, Functions and Objects](lab03)
+### [Lab 4: Python Dictionaries](lab04)
 
 # Git Resources
 ### [Pulling Saved Code From GitHub On a Different Computer](gitNewClone)
