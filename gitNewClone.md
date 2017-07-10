@@ -1,4 +1,4 @@
-# CCircle.Resources : Pulling Saved Code From GitHub On a Different Computer
+# CCircle.Git.Resources : Pulling Saved Code From GitHub On a Different Computer
 ### Prev -> [CodingCircle Summer 2017 Documentation](index)
 
 * Open PyCharm and spotlight search (Ctrl+Shift+a) "checkout from version control"
