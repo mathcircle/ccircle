@@ -46,13 +46,12 @@ class GameClientHandler(socketserver.BaseRequestHandler):
             print('!! {}  <--  < {} >'.format(self.client_address[0], e))
 
 window = ccircle.Window('Scenario 4 Server', 1024, 768)
-# window.toggleMaximized()
+window.toggleMaximized()
 
 print('TCPServer listening on {}:{}'.format(config.SERVER_HOST, config.SERVER_PORT))
 server = socketserver.TCPServer((config.SERVER_HOST, config.SERVER_PORT), GameClientHandler)
-server.state = game.State()
+server.state = game.State(window.getSize())
 server.timeout = 1.0 / 30.0
-server.state._sx, server.state._sy = window.getSize()
 
 time_last = time.time()
 while window.isOpen():
