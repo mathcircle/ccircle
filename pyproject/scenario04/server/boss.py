@@ -24,7 +24,7 @@ class Boss:
         self.x = 256
         self.y = 350
 
-        self.size = 128
+        self.size = BOSS_SIZE
         self.speed = 100
         self.vx = self.speed
 
@@ -63,5 +63,5 @@ class Boss:
           if self.vx < 0: self.facing = FACING_LEFT
 
           for player in game._players.values():
-            if util.distance(self, player) < self.size:
+            if util.distance(self, player) < BOSS_HIT_RADIUS:
               player.reset()
