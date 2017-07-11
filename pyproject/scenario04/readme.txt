@@ -39,4 +39,10 @@
     get_player_ids () -> list of player identifiers (ints)
         Returns a complete list of every player in the game (players are represented by a numeric id)
 
+    get_pos () -> (x, y)
+        Returns a tuple that gives the current coordinates of yourself
+
+    set_velocity (vx, vy) -> None
+        Sets your velocity to (vx, vy)
+
 ------------------------------------------------------------------------------------------------------------------------
