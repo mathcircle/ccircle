@@ -6,9 +6,8 @@ For questions asking you to figure out what is printed when certain code is eval
 please write down your solution to the problem _before_ trying to run the provided code on your computer.
 
 ## Lists
-1.
-    Complete the function below with a single line of code.
-
+1. Complete the function below with a single line of code.
+```python
     def squared_list(list_of_integers):
     """Returns a list corresponding to the input list of integers, with all elements squared.
 
@@ -16,10 +15,9 @@ please write down your solution to the problem _before_ trying to run the provid
     [1, 4, 9]
     """
     return _________________________
-
-2.
-    Complete the function below.
-
+```
+1. Complete the function below.
+```python
     def square_elements(list_of_integers):
     """Mutates the input list of integers, squaring all elements.
 
@@ -34,10 +32,9 @@ please write down your solution to the problem _before_ trying to run the provid
         __________________________
 
         __________________________
-
-3.
-    Complete the function below.
-
+```
+1. Complete the function below.
+```python
     def reverse(a_list):
     """Mutates the input list, reversing the elements.
 
@@ -52,27 +49,26 @@ please write down your solution to the problem _before_ trying to run the provid
         __________________________
 
         __________________________
-
+```
 #### Extra for Experts
-4.
-    There is a built-in function `zip`, which takes two lists and 'zips' them together. An example is
-
+1. There is a built-in function `zip`, which takes two lists and 'zips' them together. An example is
+```python
     >>> for tuple in zip([1, 2], ['a', 'b']):
     ...    print tuple
     (1, 'a')
     (2, 'b')
-
+```
 The documentation for `zip` is
-
+```
     zip(...)
         zip(seq1 [, seq2 [...]]) -> [(seq1[0], seq2[0] ...), (...)]
 
     Return a list of tuples, where each tuple contains the i-th element
     from each of the argument sequences.  The returned list is truncated
     in length to the length of the shortest argument sequence.
-
+```
 Write function `my_zip` that mimics the behavior of `zip`.
-
+```python
         def my_zip(a, b):
 
             __________________________
@@ -90,15 +86,12 @@ Write function `my_zip` that mimics the behavior of `zip`.
             __________________________
 
             __________________________
-
-
-
+```
 
 
 ## Functions
-1.
-    Fill in the blanks in the following function definition for adding a to the absolute value of b, without calling `abs`.
-
+1. Fill in the blanks in the following function definition for adding a to the absolute value of b, without calling `abs`.
+```python
     from operator import add, sub
 
     def a_plus_positive_b(a, b):
@@ -115,19 +108,17 @@ Write function `my_zip` that mimics the behavior of `zip`.
         else:
             f = _____
         return f(a, b)
-
-2.
-    Write what is printed when the following code is evaluated.
-
+```
+1. Write what is printed when the following code is evaluated.
+```python
     def boom():
         return 1 / 0
 
     boom
     boom()
-
-3.
-    Write what is printed when the following code is evaluated.
-
+```
+1. Write what is printed when the following code is evaluated.
+```python
     def hmm(a=[]):
       a.append(1)
       return a
@@ -135,33 +126,17 @@ Write function `my_zip` that mimics the behavior of `zip`.
     print(hmm())
     print(hmm())
     print(hmm())
-
-4.
-    Write a function named _append_ that takes in an element and appends it to a list.
-
-    def append(element, list=None):
-
-        __________________________
-
-        __________________________
-
-        __________________________
-
-        __________________________
-
-
-5.
-    Write what is printed when the following code is evaluated.
-
+```
+1. Write what is printed when the following code is evaluated.
+```python
     def magic_print(a, b):
       print(print(a), print(b))
 
     magic_print(1, 2)
-
+```
 #### Extras for Experts
-6.
-    Write what is printed when the following code is evaluated.
-
+1. Write what is printed when the following code is evaluated.
+```python
     from operator import add, mul
 
     def f(x, y):
@@ -173,17 +148,16 @@ Write function `my_zip` that mimics the behavior of `zip`.
         return mul(mul(x, y), 2)
 
     f(2, g(2, f(500, 2)))
-
-7.
-    These steps give the hailstore sequence, as written in Douglas Hofstadter's book _Gödel, Escher, Bach_.
-
+```
+1. These steps give the hailstore sequence, as written in Douglas Hofstadter's book _Gödel, Escher, Bach_.
+```
     Pick a positive integer n as the start.
     If n is even, divide it by 2.
     If n is odd, multiply it by 3 and add 1.
     Continue this process until n is 1.
-
+```
 Write function _hailstone(n)_ to print the _hailstone sequence_ starting at n, and return its length.
-
+```python
     def hailstone(n):
 
         __________________________
@@ -202,12 +176,17 @@ Write function _hailstone(n)_ to print the _hailstone sequence_ starting at n, a
 
         __________________________
 
+        __________________________
+
+        __________________________
+
+        __________________________
+```
 
 
 ## Objects
-1.
-    Write what is printed when the following code is evaluated.
-
+1. Write what is printed when the following code is evaluated.
+```python
     class Song(object):
 
         def __init__(self, lyrics):
@@ -225,16 +204,21 @@ Write function _hailstone(n)_ to print the _hailstone sequence_ starting at n, a
     ])
 
     roses_song.print_song()
-
+```
 #### Extra for Experts
-
+1. Write what is printed when the following code is evaluated.
+```python
     o = min
     o = max
     g, h = (min, max)
     max = g
-    max(o(3, g(2, h(1, 5), 3)), 4)
+    goo = max(o(3, g(2, h(1, 5), 3)), 4)
 
+    print(goo)
+```
 
 
 ## Congratulations
 You've completed this lab!
+
+### Next -> [Lab 4: Python Dictionaries](lab04)
