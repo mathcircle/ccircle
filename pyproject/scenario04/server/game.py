@@ -38,6 +38,7 @@ class State:
         image = self._images.get(name, None)
         if image: return image
         image = ccircle.Image('../image/%s' % name)
+        self._images[name] = image
         return image
 
     def _get_player(self, addr):
