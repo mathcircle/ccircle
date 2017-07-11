@@ -15,14 +15,15 @@ class State:
         self._sx, self._sy = size
         self._reset()
 
-        p0 = self._get_player('133.0.242.0'); p0.name = 'beep'
-        p1 = self._get_player('0.4124.33.1'); p1.name = 'boop'
-        p2 = self._get_player('12.0.9.1'); p2.name = 'zooooom'
-        p2.money = 1337
-        p1.money = 50
-        p0.money = 0
-        p0.vx = 100
-        p0.vy = 100
+        if DEBUG_MODE:
+            p0 = self._get_player('133.0.242.0'); p0.name = 'beep'
+            p1 = self._get_player('0.4124.33.1'); p1.name = 'boop'
+            p2 = self._get_player('12.0.9.1'); p2.name = 'zooooom'
+            p2.money = 1337
+            p1.money = 50
+            p0.money = 0
+            p0.vx = 100
+            p0.vy = 100
 
     def _draw(self, window):
         sx, sy = window.getSize()
