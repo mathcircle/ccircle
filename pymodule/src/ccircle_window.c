@@ -199,7 +199,7 @@ ccircle_window_drawcircle ( ccircle_window_t* self, PyObject* args )
   float g = 1.0f;
   float b = 1.0f;
   float a = 1.0f;
-  if (!PyArg_ParseTuple(args, "fff|fffff", &x, &y, &radius, &r, &g, &b, &a))
+  if (!PyArg_ParseTuple(args, "fff|ffff", &x, &y, &radius, &r, &g, &b, &a))
     return 0;
 
   float fv = radius / 4.0f;
