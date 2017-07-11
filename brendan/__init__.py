@@ -19,3 +19,13 @@ def reverse_sort_by_key(d):
 def sort_by_value(d):
     return sorted(d.items(), key=operator.itemgetter(1))
     # for tuple (x, y), operator.itemgetter(1) would give you y's value.
+
+# how to loop over entries in the dictionary
+d = {
+    1: 'hi',
+    2: 'low',
+    3: 'sheep'
+}
+for (key, value) in d.items():
+    # Do something with the dictionary values!
+    print(key, value)
