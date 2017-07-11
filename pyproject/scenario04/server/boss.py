@@ -1,39 +1,67 @@
 import ccircle
+import util
+
 from gameconfig import *
 from math import *
 
 class Boss:
     def __init__(self):
-        self.x = 256
-        self.y = 350
         self.vx, self.vy = 0, 0
         self.facing = FACING_RIGHT
+        self.reset()
+
+    def draw(self, game, window):
+        util.draw_image_centered('boss_%s.png' % self.facing,
+            self.x, self.y, self.size)
+        util.draw_progress_bar(
+          window,
+          self.x - self.size / 2,
+          self.y - self.size / 2,
+          self.size, 8,
+          self.health)
+
+    def reset(self):
+        self.x = 256
+        self.y = 350
+
         self.size = 128
         self.speed = 100
         self.vx = self.speed
 
-    def draw(self, game, window):
-        game._get_image('cat_%s.png' % self.facing).draw(
-            self.x - self.size / 2,
-            self.y - self.size / 2,
-            self.size,
-            self.size)
+        self.health = 100.0
+        self.dead = False
+        self.enable_ai = True
 
     def think(self, game):
         self.vy = 10.0 * cos(game._time)
 
     def update(self, game, dt):
-        self.think(game)
-        self.x += dt * self.vx
-        self.y += dt * self.vy
+        # Update health
+        if self.health <= 0:
+          self.dead = True
 
-        if self.x < 0:
-            self.x = 0
-            self.vx *= -1.0
+        if not self.dead:
+          self.health += dt * BOSS_HEALTH_REGEN
+          self.health = min(self.health, 100.0)
 
-        if self.x > game._sx:
-            self.x = game._sx
-            self.vx *= -1.0
+        # Update position
+        if not self.dead:
+          if self.enable_ai:
+            self.think(game)
+          self.x += dt * self.vx
+          self.y += dt * self.vy
 
-        if self.vx > 0: self.facing = FACING_RIGHT
-        if self.vx < 0: self.facing = FACING_LEFT
+          if self.x < 0:
+              self.x = 0
+              self.vx *= -1.0
+
+          if self.x > game._sx:
+              self.x = game._sx
+              self.vx *= -1.0
+
+          if self.vx > 0: self.facing = FACING_RIGHT
+          if self.vx < 0: self.facing = FACING_LEFT
+
+          for player in game._players.values():
+            if util.distance(self, player) < self.size:
+              player.reset()
