@@ -4,7 +4,6 @@ import socketserver
 import time
 
 import config
-import gameconfig
 import game
 
 class GameClientHandler(socketserver.BaseRequestHandler):
