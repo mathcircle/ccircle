@@ -10,12 +10,12 @@ class Reward:
         self.money = random.randint(REWARD_MIN, REWARD_MAX)
         self.remove = False
 
-    def draw(self, state, window):
+    def draw(self, game, window):
         util.draw_image_centered('reward.png', self.x, self.y, self.size)
 
-    def update(self, state, dt):
+    def update(self, game, dt):
       if not self.remove:
-        for player in state._players.values():
+        for player in game.players.values():
           if util.distance(self, player) < self.size:
             player.money += self.money
             self.remove = True

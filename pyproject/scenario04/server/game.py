@@ -12,117 +12,109 @@ from reward import Reward
 
 class State:
     def __init__(self, size):
-        self._sx, self._sy = size
-        self._reset()
+        self.sx, self.sy = size
+        self.reset()
 
         if DEBUG_MODE:
-            p0 = self._get_player('133.0.242.0'); p0.name = 'beep'
-            p1 = self._get_player('0.4124.33.1'); p1.name = 'boop'
-            p2 = self._get_player('12.0.9.1'); p2.name = 'zooooom'
+            p0 = self.get_player('133.0.242.0'); p0.name = 'beep'
+            p1 = self.get_player('0.4124.33.1'); p1.name = 'boop'
+            p2 = self.get_player('12.0.9.1'); p2.name = 'zooooom'
             p2.money = 1337
             p1.money = 50
             p0.money = 0
             p0.vx = 100
             p0.vy = 100
 
-    def _draw(self, window):
+    def draw(self, window):
         sx, sy = window.getSize()
         util.image('background.jpg').draw(0, 0, sx, sy)
-        for obj in self._rewards:
+        for obj in self.rewards:
             obj.draw(self, window)
 
-        self._boss.draw(self, window)
-        for p in self._players.values():
-            p.draw(self, window)
+        self.boss.draw(self, window)
+        for obj in self.players.values():
+            obj.draw(self, window)
 
-        window.drawRect(sx - 248, 0, 256, 72 + 16 * len(self._players), 0.2, 0.2, 0.2, 0.5)
-        window.drawRect(sx - 240, 0, 240, 64 + 16 * len(self._players), 0.4, 0.4, 0.4, 0.5)
-        util.font().draw('--- PLAYERS (%d) ---' % len(self._players), sx - 220, 32, 16)
+
+        window.drawRect(sx - 248, 0, 256, 72 + 16 * len(self.players), 0.2, 0.2, 0.2, 0.5)
+        window.drawRect(sx - 240, 0, 240, 64 + 16 * len(self.players), 0.4, 0.4, 0.4, 0.5)
+        util.font().draw('--- PLAYERS (%d) ---' % len(self.players), sx - 220, 32, 16)
         y = 40
-        for player in sorted(self._players.values(), key=lambda x: -x.money):
+        for player in sorted(self.players.values(), key=lambda x: -x.money):
             y += 16
             util.font().draw('${} : {}'.format(player.money, player.name), sx - 200, y, 12)
 
-        if self._boss.dead:
-          s = min(self._sx, self._sy)
-          window.drawRect(0, 0, self._sx, self._sy, 0.1, 0.1, 0.1, 0.9)
-          window.drawRect((self._sx - s) / 2 - 16, 0, s + 32, s, 0.2, random.uniform(0, 1), 0.2)
-          util.draw_image_centered('win.bin', self._sx / 2, self._sy / 2, s - 16)
+        if self.boss.dead:
+          s = min(self.sx, self.sy)
+          window.drawRect(0, 0, self.sx, self.sy, 0.1, 0.1, 0.1, 0.9)
+          window.drawRect((self.sx - s) / 2 - 16, 0, s + 32, s, 0.2, random.uniform(0, 1), 0.2)
+          util.draw_image_centered('win.bin', self.sx / 2, self.sy / 2, s - 16)
 
-    def _gen_reward(self):
+    def gen_reward(self):
         reward = Reward(
-            self._next_id,
-            random.randint(0, self._sx),
-            random.randint(0, self._sy))
-        self._rewards.append(reward)
-        self._next_id += 1
+            self.next_id,
+            random.randint(0, self.sx),
+            random.randint(0, self.sy))
+        self.rewards.append(reward)
+        self.next_id += 1
 
-    def _get_player(self, addr):
-        if addr in self._players:
-            return self._players[addr]
-        player = Player(self._next_id)
-        self._players[addr] = player
-        self._next_id += 1
+    def get_player(self, addr):
+        if addr in self.players:
+            return self.players[addr]
+        player = Player(self.next_id)
+        self.players[addr] = player
+        self.next_id += 1
         return player
 
-    def _get_player_by_id(self, id):
-        for player in self._players.values():
+    def get_player_by_id(self, id):
+        for player in self.players.values():
             if player.id == id:
                 return player
         return None
 
-    def _get_player_by_name(self, name):
-        for player in self._players.values():
+    def get_player_by_name(self, name):
+        for player in self.players.values():
             if player.name == name:
                 return player
         return None
 
-    def _reset(self):
-        self._boss = Boss()
-        self._rewards = []
-        self._players = {}
-        self._next_id = 0
+    def reset(self):
+        self.boss = Boss()
+        self.rewards = []
+        self.players = {}
+        self.next_id = 0
 
-        self._time = 0.0
-        self._reset_time = 1e30
+        self.time = 0.0
+        self.reset_time = 1e30
 
         for i in range(REWARD_COUNT):
-          self._gen_reward()
+          self.gen_reward()
 
-
-    def _respond(self, client, msg_name, msg_data):
-        if len(msg_name) == 0 or msg_name[0] == '_' or not hasattr(self, msg_name):
-            return "'{}' is not a valid message name".format(msg_name)
-        player = self._get_player(client)
-        player.idle = 0
-        result = getattr(self, msg_name)(player, msg_data if msg_data else None)
-        return (result, None) if type(result) == str else result
-
-    def _update(self, dt):
-        self._time += dt
-        if self._time >= self._reset_time:
-            self._reset()
+    def update(self, dt):
+        self.time += dt
+        if self.time >= self.reset_time:
+            self.reset()
 
         # Update boss
-        if not self._boss.dead:
-            self._boss.update(self, dt)
-            if self._boss.dead:
-                print('The boss is dead! Reset time is now: {}'.format(self._reset_time))
-                self._reset_time = self._time + 10.0
+        if not self.boss.dead:
+            self.boss.update(self, dt)
+            if self.boss.dead:
+                print('The boss is dead! Reset time is: {}'.format(self.reset_time))
+                self.reset_time = self.time + 10.0
 
         remove_list = []
-        for obj in self._rewards:
+        for obj in self.rewards:
             obj.update(self, dt)
             if obj.remove:
               remove_list.append(obj)
         for obj in remove_list:
-            self._rewards.remove(obj)
-        while len(self._rewards) < REWARD_COUNT:
-            self._gen_reward()
+            self.rewards.remove(obj)
+        while len(self.rewards) < REWARD_COUNT:
+            self.gen_reward()
 
         # Update players
         remove_list = []
-        for addr, player in self._players.items():
+        for addr, player in self.players.items():
             player.update(self, dt)
             player.idle += dt
             if player.idle >= PLAYER_TIMEOUT:
@@ -130,7 +122,38 @@ class State:
 
         # Remove players that exceed the idle timeout
         for addr in remove_list:
-            del self._players[addr]
+            del self.players[addr]
+
+class MessageFn:
+    def __init__(self, *params):
+        self.params = params if params != None else []
+
+    def __call__(self, fn):
+        def impl(handler, player, args):
+            extracted = []
+            for tp, name in self.params:
+                if not name in args: return 'missing argument: %s' % name
+                arg = args[name]
+                if type(arg) != tp:
+                  return '%s must have type %s' % (name, str(tp))
+                extracted.append(arg)
+            if len(extracted) > 0:
+              return fn(handler, player, *extracted)
+            else:
+              return fn(handler, player)
+        return impl
+
+class MessageHandler:
+    def __init__(self, game):
+        self.game = game
+
+    def _respond(self, client, msg_name, msg_data):
+        if len(msg_name) == 0 or msg_name[0] == '_' or not hasattr(self, msg_name):
+            return "'{}' is not a valid message name".format(msg_name)
+        player = self.game.get_player(client)
+        player.idle = 0
+        result = getattr(self, msg_name)(player, msg_data if msg_data else None)
+        return (result, None) if type(result) == str else result
 
     def _adm_auth(self, args):
         if not 'key' in args: return 'missing argument: key'
@@ -146,7 +169,7 @@ class State:
         if not 'enabled' in args: return 'missing argument: enabled'
         enabled = args['enabled']
         if type(enabled) != bool: return 'enabled must be a bool'
-        self._boss.enable_ai = enabled
+        self.game.boss.enable_ai = enabled
         return config.STATUS_GOOD
 
     def adm_money(self, player, args):
@@ -166,75 +189,81 @@ class State:
         vy = args['vy']
         if type(vx) not in (int, float): return 'vx must be numeric'
         if type(vy) not in (int, float): return 'vy must be numeric'
-        self._boss.vx = vx
-        self._boss.vy = vy
+        self.game.boss.vx = vx
+        self.game.boss.vy = vy
         return config.STATUS_GOOD
 
-    def damage_boss(self, player, args):
+    @MessageFn()
+    def damage_boss(self, player):
         if player.money < BOSS_DAMAGE_MONEY:
             return 'you need at least ${} to damage the boss'.format(BOSS_DAMAGE_MONEY)
         player.money -= BOSS_DAMAGE_MONEY
-        self._boss.health -= BOSS_DAMAGE_AMOUNT
+        self.game.boss.health -= BOSS_DAMAGE_AMOUNT
         return config.STATUS_GOOD
 
-    def get_boss_health(self, player, args):
-        return config.STATUS_GOOD, self._boss.health
+    @MessageFn()
+    def get_boss_health(self, player):
+        return config.STATUS_GOOD, self.game.boss.health
 
-    def get_boss_pos(self, player, args):
-        return config.STATUS_GOOD, (self._boss.x, self._boss.y)
+    @MessageFn()
+    def get_boss_pos(self, player):
+        return config.STATUS_GOOD, (self.game.x, self.game.boss.y)
 
-    def get_money(self, player, args):
+    @MessageFn()
+    def get_money(self, player):
         return config.STATUS_GOOD, player.money
 
-    def get_name(self, player, args):
+    @MessageFn()
+    def get_name(self, player):
         return config.STATUS_GOOD, player.name
 
-    def get_player_id_by_name(self, player, args):
-        if not 'name' in args: return 'missing argument: name'
-        name = args['name']
-        if type(name) != str: return 'name must be a string'
-        player = self._get_player_by_name(name)
+    @MessageFn((str, 'name'))
+    def get_player_id_by_name(self, player, name):
+        player = self.game.get_player_by_name(name)
         if not player: return 'no player with that name'
         return config.STATUS_GOOD, player.id
 
-    def get_player_ids(self, player, args):
-        ids = [x.id for x in self._players.values()]
+    @MessageFn()
+    def get_player_ids(self, player):
+        # TODO: Efficiency
+        ids = [x.id for x in self.game.players.values()]
         return config.STATUS_GOOD, ids
 
-    def get_player_pos(self, player, args):
-        if not 'id' in args: return 'missing argument: id'
-        other = self._get_player_by_id(args['id'])
+    @MessageFn((int, 'id'))
+    def get_player_pos(self, player, id):
+        other = self.game.get_player_by_id(id)
         if not other: return 'no player with that id'
         return config.STATUS_GOOD, (other.x, other.y)
 
-    def get_pos(self, player, args):
+    @MessageFn()
+    def get_pos(self, player):
         return config.STATUS_GOOD, (player.x, player.y)
 
-    def get_reward_ids(self, player, args):
-        ids = [x.id for x in self._rewards]
+    @MessageFn()
+    def get_reward_ids(self, player):
+        ids = [x.id for x in self.game.rewards]
         return config.STATUS_GOOD, ids
 
-    def get_reward_pos(self, player, args):
-        if not 'id' in args: return 'missing argument: id'
+    @MessageFn((int, 'id'))
+    def get_reward_pos(self, player, id):
+        # TODO: Efficiency ***
         reward = None
-        for obj in self._rewards:
-          if obj.id == args['id']:
+        for obj in self.game.rewards:
+          if obj.id == id:
             reward = obj
             break
         if not reward: return 'no reward with that id'
         return config.STATUS_GOOD, (reward.x, reward.y)
 
+    @MessageFn()
     def get_velocity(self, player, args):
         return config.STATUS_GOOD, (player.vx, player.vy)
 
-    def send_money(self, player, args):
-        if not 'id' in args: return 'missing argument: id'
-        if not 'amount' in args: return 'missing argument: amount'
-        other = self._get_player_by_id(args['id'])
+    @MessageFn((int, 'id'), (int, 'amount'))
+    def send_money(self, player, id, amount):
+        other = self.game.get_player_by_id(id)
         if not other: return 'no player with that id'
         if other == player: return 'cannot send money to yourself'
-        amount = args['amount']
-        if type(amount) != int: return 'amount must be an integer'
         if amount <= 0: return 'amount must be positive'
         if amount > player.money: return 'cannot send more money than you have'
 
@@ -242,25 +271,8 @@ class State:
         other.money += amount
         return config.STATUS_GOOD
 
-    def _set_color(self, player, args):
-        if not 'r' in args: return 'missing argument: r'
-        if not 'g' in args: return 'missing argument: g'
-        if not 'b' in args: return 'missing argument: b'
-        r = args['r']
-        g = args['g']
-        b = args['b']
-        if type(r) not in (int, float): return 'r must be numeric'
-        if type(g) not in (int, float): return 'g must be numeric'
-        if type(b) not in (int, float): return 'b must be numeric'
-        r = max(0.0, min(1.0, r))
-        g = max(0.0, min(1.0, g))
-        b = max(0.0, min(1.0, b))
-        player.color = (r, g, b)
-        return config.STATUS_GOOD
-
-    def set_name(self, player, args):
-        if not 'name' in args: return 'missing argument: name'
-        name = args['name']
+    @MessageFn((str, 'name'))
+    def set_name(self, player, name):
         if len(name) < NAME_LEN_MIN:
             return 'name is too short ({} chars min)'.format(NAME_LEN_MIN)
         if len(name) > NAME_LEN_MAX:
@@ -273,7 +285,7 @@ class State:
         if player.name == name:
             return config.STATUS_GOOD
 
-        other = self._get_player_by_name(name)
+        other = self.game.get_player_by_name(name)
         if other: return 'name is already taken'
         player.name = name
         return config.STATUS_GOOD

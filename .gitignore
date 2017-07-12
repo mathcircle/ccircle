@@ -1,3 +1,6 @@
 .idea/
 Gemfile
 _site/*
+
+dotplan/*
+**/__pycache__/*

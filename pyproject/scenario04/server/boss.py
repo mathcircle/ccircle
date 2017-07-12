@@ -33,7 +33,7 @@ class Boss:
         self.enable_ai = True
 
     def think(self, game):
-        self.vy = 10.0 * cos(game._time)
+        self.vy = 10.0 * cos(game.time)
 
     def update(self, game, dt):
         # Update health
@@ -55,13 +55,13 @@ class Boss:
               self.x = 0
               self.vx *= -1.0
 
-          if self.x > game._sx:
-              self.x = game._sx
+          if self.x > game.sx:
+              self.x = game.sx
               self.vx *= -1.0
 
           if self.vx > 0: self.facing = FACING_RIGHT
           if self.vx < 0: self.facing = FACING_LEFT
 
-          for player in game._players.values():
+          for player in game.players.values():
             if util.distance(self, player) < BOSS_HIT_RADIUS:
               player.reset()

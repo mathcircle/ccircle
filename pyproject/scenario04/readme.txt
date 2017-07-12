@@ -37,13 +37,13 @@
         Returns your player's current name
 
     get_player_ids () -> list of player identifiers (ints)
-        Returns a complete list of every player in the game (players are represented by a numeric id)
+        Returns a complete list of every player
 
     get_pos () -> (x, y)
         Returns a tuple that gives the current coordinates of yourself
 
     get_reward_ids () -> list of ids
-        Returns a list of the id of every
+        Returns a list of the id of every bag of money
 
     get_reward_pos (id) -> (x, y)
         Returns the position of the reward with the given id

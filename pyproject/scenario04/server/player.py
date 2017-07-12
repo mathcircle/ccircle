@@ -15,7 +15,7 @@ class Player:
         util.draw_image_centered(
             'player_%s.png' % self.facing,
             self.x,
-            self.y + 4 * cos(self.freq * game._time + self.phase),
+            self.y + 4 * cos(self.freq * game.time + self.phase),
             self.size)
         tx = len(self.name)
         util.font().draw(
@@ -36,7 +36,7 @@ class Player:
     def update(self, game, dt):
         self.x += dt * self.vx
         self.y += dt * self.vy
-        self.x = max(self.size / 2, min(self.x, game._sx - self.size / 2))
-        self.y = max(self.size / 2, min(self.y, game._sy - self.size / 2))
+        self.x = max(self.size / 2, min(self.x, game.sx - self.size / 2))
+        self.y = max(self.size / 2, min(self.y, game.sy - self.size / 2))
         if self.vx > 0: self.facing = FACING_RIGHT
         if self.vx < 0: self.facing = FACING_LEFT
