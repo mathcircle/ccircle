@@ -1,10 +1,12 @@
 import json
 import select
 import socket
+import sys
 import time
 
 import server.config as config
 
+LOCAL = '--local' in sys.argv
 
 class _Connection:
     """ Wraps a connection to the Scenario 4 server.
@@ -66,6 +68,8 @@ class _Connection:
             print('ERROR: {}'.format(e))
             return None
 
+HOST = config.SERVER_HOST if not LOCAL else 'localhost'
+PORT = config.SERVER_PORT
 
 def create():
-    return _Connection(config.SERVER_HOST, config.SERVER_PORT)
+    return _Connection(HOST, PORT)

@@ -98,7 +98,7 @@ class State:
         if not self.boss.dead:
             self.boss.update(self, dt)
             if self.boss.dead:
-                print('The boss is dead! Reset time is now: {}'.format(self.reset_time))
+                print('The boss is dead! Reset time is: {}'.format(self.reset_time))
                 self.reset_time = self.time + 10.0
 
         remove_list = []
@@ -123,6 +123,25 @@ class State:
         for addr in remove_list:
             del self.players[addr]
 
+class MessageFn:
+    def __init__(self, *params):
+        self.params = params if params != None else []
+
+    def __call__(self, fn):
+        def impl(handler, player, args):
+            extracted = []
+            for tp, name in self.params:
+                if not name in args: return 'missing argument: %s' % name
+                arg = args[name]
+                if type(arg) != tp:
+                  return '%s must have type %s' % (name, str(tp))
+                extracted.append(arg)
+            if len(extracted) > 0:
+              return fn(handler, player, *extracted)
+            else:
+              return fn(handler, player)
+        return impl
+
 class MessageHandler:
     def __init__(self, game):
         self.game = game
@@ -130,7 +149,7 @@ class MessageHandler:
     def _respond(self, client, msg_name, msg_data):
         if len(msg_name) == 0 or msg_name[0] == '_' or not hasattr(self, msg_name):
             return "'{}' is not a valid message name".format(msg_name)
-        player = self.get_player(client)
+        player = self.game.get_player(client)
         player.idle = 0
         result = getattr(self, msg_name)(player, msg_data if msg_data else None)
         return (result, None) if type(result) == str else result
@@ -144,16 +163,16 @@ class MessageHandler:
         return True
 
     def adm_enable_ai(self, player, args):
-        result = self.adm_auth(args)
+        result = self._adm_auth(args)
         if type(result) == str: return result
         if not 'enabled' in args: return 'missing argument: enabled'
         enabled = args['enabled']
         if type(enabled) != bool: return 'enabled must be a bool'
-        self.boss.enable_ai = enabled
+        self.game.boss.enable_ai = enabled
         return config.STATUS_GOOD
 
     def adm_money(self, player, args):
-        result = self.adm_auth(args)
+        result = self._adm_auth(args)
         if type(result) == str: return result
         if not 'amount' in args: return 'missing argument: amount'
         amount = args['amount']
@@ -169,75 +188,81 @@ class MessageHandler:
         vy = args['vy']
         if type(vx) not in (int, float): return 'vx must be numeric'
         if type(vy) not in (int, float): return 'vy must be numeric'
-        self.boss.vx = vx
-        self.boss.vy = vy
+        self.game.boss.vx = vx
+        self.game.boss.vy = vy
         return config.STATUS_GOOD
 
-    def damage_boss(self, player, args):
+    @MessageFn()
+    def damage_boss(self, player):
         if player.money < BOSS_DAMAGE_MONEY:
             return 'you need at least ${} to damage the boss'.format(BOSS_DAMAGE_MONEY)
         player.money -= BOSS_DAMAGE_MONEY
-        self.boss.health -= BOSS_DAMAGE_AMOUNT
+        self.game.boss.health -= BOSS_DAMAGE_AMOUNT
         return config.STATUS_GOOD
 
-    def get_boss_health(self, player, args):
-        return config.STATUS_GOOD, self.boss.health
+    @MessageFn()
+    def get_boss_health(self, player):
+        return config.STATUS_GOOD, self.game.boss.health
 
-    def get_boss_pos(self, player, args):
-        return config.STATUS_GOOD, (self.boss.x, self.boss.y)
+    @MessageFn()
+    def get_boss_pos(self, player):
+        return config.STATUS_GOOD, (self.game.x, self.game.boss.y)
 
-    def get_money(self, player, args):
+    @MessageFn()
+    def get_money(self, player):
         return config.STATUS_GOOD, player.money
 
-    def get_name(self, player, args):
+    @MessageFn()
+    def get_name(self, player):
         return config.STATUS_GOOD, player.name
 
-    def get_player_id_by_name(self, player, args):
-        if not 'name' in args: return 'missing argument: name'
-        name = args['name']
-        if type(name) != str: return 'name must be a string'
-        player = self.get_player_by_name(name)
+    @MessageFn((str, 'name'))
+    def get_player_id_by_name(self, player, name):
+        player = self.game.get_player_by_name(name)
         if not player: return 'no player with that name'
         return config.STATUS_GOOD, player.id
 
-    def get_player_ids(self, player, args):
-        ids = [x.id for x in self.players.values()]
+    @MessageFn()
+    def get_player_ids(self, player):
+        # TODO: Efficiency
+        ids = [x.id for x in self.game.players.values()]
         return config.STATUS_GOOD, ids
 
-    def get_player_pos(self, player, args):
-        if not 'id' in args: return 'missing argument: id'
-        other = self.get_player_by_id(args['id'])
+    @MessageFn((int, 'id'))
+    def get_player_pos(self, player, id):
+        other = self.game.get_player_by_id(id)
         if not other: return 'no player with that id'
         return config.STATUS_GOOD, (other.x, other.y)
 
-    def get_pos(self, player, args):
+    @MessageFn()
+    def get_pos(self, player):
         return config.STATUS_GOOD, (player.x, player.y)
 
-    def get_reward_ids(self, player, args):
-        ids = [x.id for x in self.rewards]
+    @MessageFn()
+    def get_reward_ids(self, player):
+        ids = [x.id for x in self.game.rewards]
         return config.STATUS_GOOD, ids
 
-    def get_reward_pos(self, player, args):
-        if not 'id' in args: return 'missing argument: id'
+    @MessageFn((int, 'id'))
+    def get_reward_pos(self, player, id):
+        # TODO: Efficiency ***
         reward = None
-        for obj in self.rewards:
-          if obj.id == args['id']:
+        for obj in self.game.rewards:
+          if obj.id == id:
             reward = obj
             break
         if not reward: return 'no reward with that id'
         return config.STATUS_GOOD, (reward.x, reward.y)
 
+    @MessageFn()
     def get_velocity(self, player, args):
         return config.STATUS_GOOD, (player.vx, player.vy)
 
-    def send_money(self, player, args):
-        if not 'id' in args: return 'missing argument: id'
-        if not 'amount' in args: return 'missing argument: amount'
-        other = self.get_player_by_id(args['id'])
+    @MessageFn((int, 'id'), (int, 'amount'))
+    def send_money(self, player, id, amount):
+        other = self.game.get_player_by_id(id)
         if not other: return 'no player with that id'
         if other == player: return 'cannot send money to yourself'
-        amount = args['amount']
-        if type(amount) != int: return 'amount must be an integer'
         if amount <= 0: return 'amount must be positive'
         if amount > player.money: return 'cannot send more money than you have'
 
@@ -245,25 +270,8 @@ class MessageHandler:
         other.money += amount
         return config.STATUS_GOOD
 
-    def _set_color(self, player, args):
-        if not 'r' in args: return 'missing argument: r'
-        if not 'g' in args: return 'missing argument: g'
-        if not 'b' in args: return 'missing argument: b'
-        r = args['r']
-        g = args['g']
-        b = args['b']
-        if type(r) not in (int, float): return 'r must be numeric'
-        if type(g) not in (int, float): return 'g must be numeric'
-        if type(b) not in (int, float): return 'b must be numeric'
-        r = max(0.0, min(1.0, r))
-        g = max(0.0, min(1.0, g))
-        b = max(0.0, min(1.0, b))
-        player.color = (r, g, b)
-        return config.STATUS_GOOD
-
-    def set_name(self, player, args):
-        if not 'name' in args: return 'missing argument: name'
-        name = args['name']
+    @MessageFn((str, 'name'))
+    def set_name(self, player, name):
         if len(name) < NAME_LEN_MIN:
             return 'name is too short ({} chars min)'.format(NAME_LEN_MIN)
         if len(name) > NAME_LEN_MAX:
@@ -276,7 +284,7 @@ class MessageHandler:
         if player.name == name:
             return config.STATUS_GOOD
 
-        other = self.get_player_by_name(name)
+        other = self.game.get_player_by_name(name)
         if other: return 'name is already taken'
         player.name = name
         return config.STATUS_GOOD

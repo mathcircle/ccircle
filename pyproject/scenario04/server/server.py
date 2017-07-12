@@ -1,10 +1,13 @@
 import ccircle
 import json
 import socketserver
+import sys
 import time
 
 import config
 import game
+
+LOCAL = '--local' in sys.argv
 
 class GameClientHandler(socketserver.BaseRequestHandler):
     """ Responds to requests from clients by unpacking messages and passing them to
@@ -24,7 +27,7 @@ class GameClientHandler(socketserver.BaseRequestHandler):
             else:
                 print('{}  --> {}'.format(self.client_address[0], msg_name))
 
-            status, data = self.server.state._respond(self.client_address[0], msg_name, msg_data)
+            status, data = self.server.handler._respond(self.client_address[0], msg_name, msg_data)
             self.respond(status, data)
 
         except Exception as e:
@@ -45,11 +48,16 @@ class GameClientHandler(socketserver.BaseRequestHandler):
             print('!! {}  <--  < {} >'.format(self.client_address[0], e))
 
 window = ccircle.Window('Scenario 4 Server', 1024, 768)
-window.toggleMaximized()
+if not LOCAL:
+    window.toggleMaximized()
 
-print('TCPServer listening on {}:{}'.format(config.SERVER_HOST, config.SERVER_PORT))
-server = socketserver.TCPServer((config.SERVER_HOST, config.SERVER_PORT), GameClientHandler)
+HOST = config.SERVER_HOST if not LOCAL else 'localhost'
+PORT = config.SERVER_PORT
+
+print('TCPServer listening on {}:{}'.format(HOST, PORT))
+server = socketserver.TCPServer((HOST, PORT), GameClientHandler)
 server.state = game.State(window.getSize())
+server.handler = game.MessageHandler(server.state)
 server.timeout = 1.0 / 30.0
 
 time_last = time.time()
@@ -61,10 +69,10 @@ while window.isOpen():
 
     # Update step
     time_now = time.time()
-    server.state._update(time_now - time_last)
+    server.state.update(time_now - time_last)
     time_last = time_now
 
     # Draw
-    server.state._draw(window)
+    server.state.draw(window)
 
     window.update()
