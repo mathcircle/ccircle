@@ -27,6 +27,9 @@ def image(name):
     cache_image[name] = x
     return x
 
+def lerp(a, b, t):
+    return a + (b - a) * t
+
 def draw_image_centered(name, x, y, size):
     image(name).draw(x - size / 2, y - size / 2, size, size)
 

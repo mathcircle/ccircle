@@ -37,7 +37,7 @@ class State:
 
         window.drawRect(sx - 248, 0, 256, 72 + 16 * len(self._players), 0.2, 0.2, 0.2, 0.5)
         window.drawRect(sx - 240, 0, 240, 64 + 16 * len(self._players), 0.4, 0.4, 0.4, 0.5)
-        util.font().draw('--- PLAYERS ---', sx - 220, 32, 16)
+        util.font().draw('--- PLAYERS (%d) ---' % len(self._players), sx - 220, 32, 16)
         y = 40
         for player in sorted(self._players.values(), key=lambda x: -x.money):
             y += 16

@@ -53,7 +53,7 @@ server = socketserver.TCPServer((config.SERVER_HOST, config.SERVER_PORT), GameCl
 server.state = game.State(window.getSize())
 server.timeout = 1.0 / 30.0
 
-time_last = time.time()
+time_last = time.perf_counter()
 while window.isOpen():
     window.clear(0.1, 0.1, 0.1)
 
@@ -61,7 +61,7 @@ while window.isOpen():
     server.handle_request()
 
     # Update step
-    time_now = time.time()
+    time_now = time.perf_counter()
     server.state._update(time_now - time_last)
     time_last = time_now
 
