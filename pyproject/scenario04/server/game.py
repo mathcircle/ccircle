@@ -58,6 +58,12 @@ class State:
         self.rewards.append(reward)
         self.next_id += 1
 
+    def get_reward_by_id(self, id):
+        for obj in self.rewards:
+            if obj.id == id:
+                return obj
+        return None
+
     def get_player(self, addr):
         if addr in self.players:
             return self.players[addr]
@@ -152,7 +158,7 @@ class MessageHandler:
             return "'{}' is not a valid message name".format(msg_name)
         player = self.game.get_player(client)
         player.idle = 0
-        result = getattr(self, msg_name)(player, msg_data if msg_data else None)
+        result = getattr(self, msg_name)(player, msg_data if msg_data else {})
         return (result, None) if type(result) == str else result
 
     def _adm_auth(self, args):
@@ -166,6 +172,7 @@ class MessageHandler:
     def adm_enable_ai(self, player, args):
         result = self._adm_auth(args)
         if type(result) == str: return result
+
         if not 'enabled' in args: return 'missing argument: enabled'
         enabled = args['enabled']
         if type(enabled) != bool: return 'enabled must be a bool'
@@ -175,6 +182,7 @@ class MessageHandler:
     def adm_money(self, player, args):
         result = self._adm_auth(args)
         if type(result) == str: return result
+
         if not 'amount' in args: return 'missing argument: amount'
         amount = args['amount']
         if type(amount) != int: return 'amount must be an int'
@@ -183,6 +191,9 @@ class MessageHandler:
         return config.STATUS_GOOD
 
     def adm_set_boss_velocity(self, player, args):
+        result = self._adm_auth(args)
+        if type(result) == str: return result
+
         if not 'vx' in args: return 'missing argument: vx'
         if not 'vy' in args: return 'missing argument: vy'
         vx = args['vx']
@@ -207,7 +218,7 @@ class MessageHandler:
 
     @MessageFn()
     def get_boss_pos(self, player):
-        return config.STATUS_GOOD, (self.game.x, self.game.boss.y)
+        return config.STATUS_GOOD, (self.game.boss.x, self.game.boss.y)
 
     @MessageFn()
     def get_money(self, player):
@@ -246,12 +257,8 @@ class MessageHandler:
 
     @MessageFn((int, 'id'))
     def get_reward_pos(self, player, id):
-        # TODO: Efficiency ***
-        reward = None
-        for obj in self.game.rewards:
-          if obj.id == id:
-            reward = obj
-            break
+        # TODO: Efficiency
+        reward = self.game.get_reward_by_id(id)
         if not reward: return 'no reward with that id'
         return config.STATUS_GOOD, (reward.x, reward.y)
 
@@ -264,8 +271,8 @@ class MessageHandler:
         other = self.game.get_player_by_id(id)
         if not other: return 'no player with that id'
         if other == player: return 'cannot send money to yourself'
-        if amount <= 0: return 'amount must be positive'
         if amount > player.money: return 'cannot send more money than you have'
+        if amount <= 0: return 'amount must be positive'
 
         player.money -= amount
         other.money += amount

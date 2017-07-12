@@ -3,6 +3,8 @@ from math import *
 
 cache_font = {}
 cache_image = {}
+log_file = None
+DO_LOG_FILE = False
 
 def distance(a, b):
   dx = a.x - b.x
@@ -29,6 +31,14 @@ def image(name):
 
 def lerp(a, b, t):
     return a + (b - a) * t
+
+def log(x):
+    if DO_LOG_FILE:
+        global log_file
+        if not log_file:
+            log_file = open('log.txt', 'w')
+        log_file.write(x + '\n')
+    print(x)
 
 def draw_image_centered(name, x, y, size):
     image(name).draw(x - size / 2, y - size / 2, size, size)
