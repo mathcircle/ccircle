@@ -169,6 +169,17 @@ class MessageHandler:
         if h != ADMIN_KEY_HASH: return 'admin key is incorrect'
         return True
 
+    def adm_add_money(self, player, args):
+        result = self._adm_auth(args)
+        if type(result) == str: return result
+
+        if not 'amount' in args: return 'missing argument: amount'
+        amount = args['amount']
+        if type(amount) != int: return 'amount must be an int'
+        if amount <= 0: return 'amount must be positive'
+        player.money += amount
+        return config.STATUS_GOOD
+
     def adm_enable_ai(self, player, args):
         result = self._adm_auth(args)
         if type(result) == str: return result
@@ -177,17 +188,6 @@ class MessageHandler:
         enabled = args['enabled']
         if type(enabled) != bool: return 'enabled must be a bool'
         self.game.boss.enable_ai = enabled
-        return config.STATUS_GOOD
-
-    def adm_money(self, player, args):
-        result = self._adm_auth(args)
-        if type(result) == str: return result
-
-        if not 'amount' in args: return 'missing argument: amount'
-        amount = args['amount']
-        if type(amount) != int: return 'amount must be an int'
-        if amount < 0: return 'amount must be non-negative'
-        player.money = amount
         return config.STATUS_GOOD
 
     def adm_set_boss_velocity(self, player, args):
