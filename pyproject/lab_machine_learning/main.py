@@ -1,17 +1,17 @@
 import markov
 import util
 
-words = util.readWords('text/spongebob_texas.txt')
-
-chain = markov.Chain(1)
-for word in words:
-    chain.observe(word)
+elems = util.readWords('text/spongebob_texas.txt')
+chain = markov.Chain(2)
+for x in elems:
+    chain.observe(x)
 
 content = chain.chooseFirst()
-for i in range(1000):
+for i in range(100):
     next = chain.chooseNext()
     if not next: break
     content.append(next)
 
 content = ' '.join(content)
-util.writeFile('gen.txt', content)
+print(content)
+input()
