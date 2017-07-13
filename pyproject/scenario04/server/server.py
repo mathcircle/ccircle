@@ -6,6 +6,7 @@ import time
 
 import config
 import game
+import util
 
 LOCAL = '--local' in sys.argv
 
@@ -23,15 +24,15 @@ class GameClientHandler(socketserver.BaseRequestHandler):
 
             msg_data = msg.get('data', None)
             if msg_data:
-                print('{}  --> {} {}'.format(self.client_address[0], msg_name, msg_data))
+                util.log('{}  --> {} {}'.format(self.client_address[0], msg_name, msg_data))
             else:
-                print('{}  --> {}'.format(self.client_address[0], msg_name))
+                util.log('{}  --> {}'.format(self.client_address[0], msg_name))
 
             status, data = self.server.handler._respond(self.client_address[0], msg_name, msg_data)
             self.respond(status, data)
 
         except Exception as e:
-            print('!! {}  -->  < {} >'.format(self.client_address[0], e))
+            util.log('!! {}  -->  < {} >'.format(self.client_address[0], e))
             self.respond('server_error', None)
             return
 
@@ -40,12 +41,12 @@ class GameClientHandler(socketserver.BaseRequestHandler):
             response = {'status': status}
             if data:
                 response['data'] = data
-                print('{}  <-- {} {}'.format(self.client_address[0], status, data))
+                util.log('{}  <-- {} {}'.format(self.client_address[0], status, data))
             else:
-                print('{}  <-- {}'.format(self.client_address[0], status))
+                util.log('{}  <-- {}'.format(self.client_address[0], status))
             self.request.sendall(bytes(json.dumps(response), 'utf-8'))
         except Exception as e:
-            print('!! {}  <--  < {} >'.format(self.client_address[0], e))
+            util.log('!! {}  <--  < {} >'.format(self.client_address[0], e))
 
 window = ccircle.Window('Scenario 4 Server', 1024, 768)
 if not LOCAL:
@@ -54,7 +55,7 @@ if not LOCAL:
 HOST = config.SERVER_HOST if not LOCAL else 'localhost'
 PORT = config.SERVER_PORT
 
-print('TCPServer listening on {}:{}'.format(HOST, PORT))
+util.log('>> server started on {}:{} <<'.format(HOST, PORT))
 server = socketserver.TCPServer((HOST, PORT), GameClientHandler)
 server.state = game.State(window.getSize())
 server.handler = game.MessageHandler(server.state)
@@ -76,3 +77,5 @@ while window.isOpen():
     server.state.draw(window)
 
     window.update()
+
+util.log('>> server shutting down gracefully <<')
