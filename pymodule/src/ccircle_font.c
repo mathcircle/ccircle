@@ -16,9 +16,7 @@ typedef struct {
   FT_Face face;
 } ccircle_font_t;
 
-static int
-ccircle_font_init ( ccircle_font_t* self, PyObject* args )
-{
+static int ccircle_font_init ( ccircle_font_t* self, PyObject* args ) {
   cstr path = DEFAULT_FONT;
   if (!PyArg_ParseTuple(args, "|s", &path))
     return -1;
@@ -32,12 +30,10 @@ ccircle_font_init ( ccircle_font_t* self, PyObject* args )
 
 /* --- Font::draw ---------------------------------------------------------- */
 
-/* TODO : Should take a window object and make sure the window's GL context is
- *        current. */
+static PyObject* ccircle_font_draw ( ccircle_font_t* self, PyObject* args ) {
+  if (!CC_GLContext_Exists())
+    Fatal("A window must be created before text can be drawn");
 
-static PyObject*
-ccircle_font_draw ( ccircle_font_t* self, PyObject* args )
-{
   cstr text;
   float fx, fy;
   float fsize = DEFAULT_FONT_SIZE;
@@ -134,8 +130,7 @@ static PyTypeObject ccircle_font_pytype = {
 
 /* -------------------------------------------------------------------------- */
 
-void ccircle_init_font ( PyObject* self )
-{
+void CC_Init_Font ( PyObject* self ) {
   ccircle_font_pytype.tp_new = PyType_GenericNew;
   if (PyType_Ready(&ccircle_font_pytype) < 0)
     Fatal("Failed to create font type");

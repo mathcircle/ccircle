@@ -12,14 +12,22 @@ typedef unsigned short ushort;
 typedef unsigned int uint;
 typedef unsigned long ulong;
 
-void ccircle_init_font   ( PyObject* );
-void ccircle_init_image  ( PyObject* );
-void ccircle_init_input  ( PyObject* );
-void ccircle_init_window ( PyObject* );
+void CC_Init_Font   ( PyObject* );
+void CC_Init_Image  ( PyObject* );
+void CC_Init_Input  ( PyObject* );
+void CC_Init_Sound  ( PyObject* );
+void CC_Init_Window ( PyObject* );
+
+bool   CC_GLContext_Exists ( void );
+uchar* CC_Image_Load       ( cstr path, int* sx, int* sy, int* chan );
+void   CC_Image_Free       ( uchar* );
 
 void Fatal (cstr s);
 
-uchar* ccircle_image_load ( cstr path, int* sx, int* sy, int* chan );
-void   ccircle_image_free ( uchar* );
+#define Tau 6.28318531
+#define Pi 3.14159265
+#define Pi2 1.57079633f
+#define Pi4 0.785398163f
+#define Pi6 0.523598776f
 
 #endif

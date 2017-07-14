@@ -2,9 +2,7 @@
 
 /* --- isKeyDown ------------------------------------------------------------ */
 
-static PyObject*
-ccircle_keydown ( PyObject* self, PyObject* args )
-{
+static PyObject* ccircle_keydown ( PyObject* self, PyObject* args ) {
   char* key;
   int vk = -1;
   if (!PyArg_ParseTuple(args, "s", &key))
@@ -70,9 +68,7 @@ ccircle_keydown ( PyObject* self, PyObject* args )
 
 /* --- isMouseDown ---------------------------------------------------------- */
 
-static PyObject*
-ccircle_mousedown ( PyObject* self, PyObject* args )
-{
+static PyObject* ccircle_mousedown ( PyObject* self, PyObject* args ) {
   char* button;
   int vk = -1;
   if (!PyArg_ParseTuple(args, "s", &button))
@@ -106,7 +102,6 @@ static PyMethodDef functions[] = {
   { 0, 0, 0, 0 },
 };
 
-void ccircle_init_input ( PyObject* self )
-{
+void CC_Init_Input ( PyObject* self ) {
   PyModule_AddFunctions(self, functions);
 }

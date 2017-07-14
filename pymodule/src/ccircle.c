@@ -12,24 +12,23 @@ static struct PyModuleDef ccircle_module = {
   ccircle_methods,
 };
 
-void Fatal ( cstr s )
-{
+void Fatal ( cstr s ) {
   MessageBox(0, s, "Fatal Error in CCircle Module", MB_OK);
   exit(0);
 }
 
 PyMODINIT_FUNC
-PyInit_ccircle ( void )
-{
+PyInit_ccircle ( void ) {
   PyObject* self = PyModule_Create(&ccircle_module);
   if (self == 0)
     return 0;
 
   /* Submodule Initialization. */ {
-    ccircle_init_font(self);
-    ccircle_init_image(self);
-    ccircle_init_input(self);
-    ccircle_init_window(self);
+    CC_Init_Font(self);
+    CC_Init_Image(self);
+    CC_Init_Input(self);
+    CC_Init_Sound(self);
+    CC_Init_Window(self);
   }
 
   return self;
