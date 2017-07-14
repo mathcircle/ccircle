@@ -58,7 +58,9 @@ static PyObject* CC_Image_Draw ( CC_Image* self, PyObject* args ) {
   glMatrixMode(GL_MODELVIEW);
   glPushMatrix();
   glLoadIdentity();
-  glRotatef(angle, 0, 0, 1);
+  glTranslatef(0.5f * sx, 0.5f * sy, 0);
+  glRotatef(angle, 0, 0, -1);
+  glTranslatef(-0.5f * sx, -0.5f * sy, 0);
 
   glBegin(GL_QUADS);
   glTexCoord2f(0, 0); glVertex2f(x, y);
