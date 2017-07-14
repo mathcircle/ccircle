@@ -2,14 +2,15 @@
 #include <math.h>
 
 #define SAMPLE_RATE 44100
-
+ 
 /* TODO : Free sound data */
 
 typedef struct {
   PyObject_HEAD
   int size;
   int capacity;
-  char* data;
+  float* samples;
+  char* buffer;
 } CC_Sound;
 
 typedef struct {
@@ -32,6 +33,7 @@ typedef struct {
 
 typedef int16_t SampleType;
 const int Sample_Max = ((1 << (8 * (int)sizeof(SampleType) - 1)) - 1);
+const float fSampleRate = (float)SAMPLE_RATE;
 
 /* -------------------------------------------------------------------------- */
 
@@ -48,15 +50,10 @@ inline static int SecToSample (float x) {
   return max(0, (int)(x * SAMPLE_RATE));
 }
 
-/* Return a pointer to the sound's sample buffer. */
-inline static SampleType* CC_Sound_GetSampleData ( CC_Sound* self ) {
-  return (SampleType*)(self->data + sizeof(WaveHeader));
-}
-
 /* Double the capacity of the sound's sample buffer. */
 static void CC_Sound_Grow ( CC_Sound* self ) {
   self->capacity *= 2;
-  self->data = realloc(self->data, sizeof(WaveHeader) + sizeof(SampleType) * self->capacity);
+  self->samples = realloc(self->samples, sizeof(float) * self->capacity);
 }
 
 /* Ensure that the sound contains at least minSamples. Any samples that must be
@@ -66,7 +63,7 @@ static void CC_Sound_Extend ( CC_Sound* self, int minSamples ) {
     return;
   while (self->capacity < minSamples)
     CC_Sound_Grow(self);
-  memset(CC_Sound_GetSampleData(self) + self->size, 0, minSamples - self->size);
+  memset(self->samples + self->size, 0, sizeof(float) * (minSamples - self->size));
   self->size = minSamples;
 }
 
@@ -75,40 +72,46 @@ static void CC_Sound_Extend ( CC_Sound* self, int minSamples ) {
 static int CC_Sound_Init ( CC_Sound* self, PyObject* args ) {
   self->size = 0;
   self->capacity = SAMPLE_RATE;
-  self->data = malloc(sizeof(WaveHeader) + sizeof(SampleType) * self->capacity);
-
-  WaveHeader* wav    = (WaveHeader*)self->data;
-  wav->chunkID       = 0x46464952;
-  wav->format        = 0x45564157;
-
-  wav->subChunk1ID   = 0x20746d66;
-  wav->subChunk1Size = 16;
-  wav->audioFormat   = 1;
-  wav->channels      = 1;
-  wav->sampleRate    = SAMPLE_RATE;
-  wav->bitsPerSample = 8 * sizeof(SampleType);
-  wav->byteRate      = wav->sampleRate * wav->channels * (wav->bitsPerSample / 8);
-  wav->blockAlign    = wav->channels * (wav->bitsPerSample / 8);
-
-  wav->subChunk2ID   = 0x61746164;
-  wav->subChunk2Size = self->size * wav->blockAlign;
-  wav->chunkSize     = 4 + (8 + wav->subChunk1Size) + (8 + wav->subChunk2Size);
+  self->samples = malloc(sizeof(float) * self->capacity);
+  self->buffer = 0;
   return 0;
 }
 
 /* --- Sound.addSample ------------------------------------------------------ */
 
 static PyObject* CC_Sound_AddSample ( CC_Sound* self, PyObject* args ) {
-  float fSample;
-  if (!PyArg_ParseTuple(args, "f", &fSample))
+  float sample;
+  if (!PyArg_ParseTuple(args, "f", &sample))
     return 0;
   if (self->size == self->capacity)
     CC_Sound_Grow(self);
-  CC_Sound_GetSampleData(self)[self->size++] = FloatToSample(fSample);
+  self->samples[self->size++] = sample;
   Py_RETURN_NONE;
 }
 
-/* --- Sound.addSine -------------------------------------------------------- */
+/* --- Sound.addSine --------------------------------------------------------- */
+
+static PyObject* CC_Sound_AddSaw ( CC_Sound* self, PyObject* args) {
+  float start, duration, freq, amp;
+  if (!PyArg_ParseTuple(args, "ffff", &start, &duration, &freq, &amp))
+    return 0;
+  if (start < 0.0f || duration <= 0.0f)
+    return 0;
+
+  int startSample = SecToSample(start);
+  int durationSamples = SecToSample(duration);
+  CC_Sound_Extend(self, startSample + durationSamples - 1);
+
+  float* pSamples = self->samples + startSample;
+  for (int i = 0; i < durationSamples; ++i) {
+    float t = (float)i / fSampleRate;
+    *(pSamples++) += amp * (2.0f * fmod(t * freq, 1.0) - 1.0f);
+  }
+
+  Py_RETURN_NONE;
+}
+
+/* --- Sound.addSine --------------------------------------------------------- */
 
 static PyObject* CC_Sound_AddSine ( CC_Sound* self, PyObject* args) {
   float start, duration, freq, amp;
@@ -122,10 +125,10 @@ static PyObject* CC_Sound_AddSine ( CC_Sound* self, PyObject* args) {
   CC_Sound_Extend(self, startSample + durationSamples - 1);
 
   freq *= Tau;
-  SampleType* data = CC_Sound_GetSampleData(self) + startSample;
+  float* pSamples = self->samples + startSample;
   for (int i = 0; i < durationSamples; ++i) {
-    float t = (float)i / (float)SAMPLE_RATE;
-    data[i] += FloatToSample(amp * sin(freq * t));
+    float t = (float)i / fSampleRate;
+    *(pSamples++) += amp * sin(freq * t);
   }
 
   Py_RETURN_NONE;
@@ -139,17 +142,37 @@ static PyObject* CC_Sound_GetSample ( CC_Sound* self, PyObject* args) {
     return 0;
   if (index >= self->size)
     return 0;
-  return PyFloat_FromDouble(
-    (double)CC_Sound_GetSampleData(self)[index] / (double)Sample_Max);
+  return PyFloat_FromDouble(self->samples[index]);
 }
 
 /* --- Sound.play ----------------------------------------------------------- */
 
 static PyObject* CC_Sound_Play ( CC_Sound* self, PyObject* args ) {
-  WaveHeader* wav    = (WaveHeader*)self->data;
-  wav->subChunk2Size = self->size * wav->blockAlign;
-  wav->chunkSize     = 4 + (8 + wav->subChunk1Size) + (8 + wav->subChunk2Size);
-  PlaySound((char*)wav, 0, SND_MEMORY | SND_ASYNC);
+  if (!self->buffer) {
+    self->buffer = malloc(sizeof(WaveHeader) + self->size * sizeof(SampleType));
+
+    float* pNative = self->samples;
+    SampleType* pConverted = (SampleType*)(self->buffer + sizeof(WaveHeader));
+    for (int i = 0; i < self->size; ++i)
+      *(pConverted++) = FloatToSample(*pNative++);
+
+    WaveHeader* wav    = (WaveHeader*)self->buffer;
+    wav->chunkID       = 0x46464952;
+    wav->format        = 0x45564157;
+    wav->subChunk1ID   = 0x20746d66;
+    wav->subChunk1Size = 16;
+    wav->audioFormat   = 1;
+    wav->channels      = 1;
+    wav->sampleRate    = SAMPLE_RATE;
+    wav->bitsPerSample = 8 * sizeof(SampleType);
+    wav->byteRate      = wav->sampleRate * wav->channels * (wav->bitsPerSample / 8);
+    wav->blockAlign    = wav->channels * (wav->bitsPerSample / 8);
+    wav->subChunk2ID   = 0x61746164;
+    wav->subChunk2Size = self->size * wav->blockAlign;
+    wav->chunkSize     = 4 + (8 + wav->subChunk1Size) + (8 + wav->subChunk2Size);
+  }
+
+  PlaySound(self->buffer, 0, SND_MEMORY | SND_ASYNC);
   Py_RETURN_NONE;
 }
 
@@ -157,6 +180,7 @@ static PyObject* CC_Sound_Play ( CC_Sound* self, PyObject* args ) {
 
 static PyMethodDef methods[] = {
   { "addSample", (PyCFunction)CC_Sound_AddSample, METH_VARARGS, 0 },
+  { "addSaw", (PyCFunction)CC_Sound_AddSaw, METH_VARARGS, 0 },
   { "addSine", (PyCFunction)CC_Sound_AddSine, METH_VARARGS, 0 },
   { "getSample", (PyCFunction)CC_Sound_GetSample, METH_VARARGS, 0 },
   { "play", (PyCFunction)CC_Sound_Play, METH_VARARGS, 0 },

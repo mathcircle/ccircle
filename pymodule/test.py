@@ -16,6 +16,9 @@ sound = ccircle.Sound()
 sound.addSine(0, 1, 120, 0.2)
 sound.addSine(0, 1, 60, 0.2)
 sound.addSine(0, 1, 90, 0.2)
+sound.addSaw(1, 2, 60, 0.2)
+sound.addSaw(1, 2, 240, 0.2)
+sound.addSaw(1, 2, 480, 0.2)
 sound.play()
 
 t = 0
