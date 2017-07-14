@@ -13,6 +13,8 @@ def sawtooth(t, f):
 def sine(t, f):
     return sin(2.0 * pi * t * f)
 
-mysound.addSine(0, 1, util.getNoteFrequency(60), 1)
+for i in range(44100):
+    t = i / 44100
+    mysound.addSample(sine(t, 440))
 mysound.play()
 time.sleep(1)
