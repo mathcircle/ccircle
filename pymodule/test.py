@@ -13,8 +13,9 @@ cat = ccircle.Image('res/cat.png')
 font = ccircle.Font('res/FiraMono.ttf')
 
 sound = ccircle.Sound()
-sound.addSine(0, 1, 440, 0.5)
-sound.addSine(0.5, 0.5, 880, 0.5)
+sound.addSine(0, 1, 120, 0.2)
+sound.addSine(0, 1, 60, 0.2)
+sound.addSine(0, 1, 90, 0.2)
 sound.play()
 
 t = 0
@@ -25,6 +26,9 @@ while window.isOpen():
 
   t += 1.0
   cat.draw(16, 16, 128, 128, t)
+
+  cx, cy = cat.getSize()
+  cat.drawSub(128, 32, 128, 128, cx / 4, cy / 4, cx / 8, cy / 8, -t)
   font.draw("I'm a cat! :3", 140, 64 + 32, 12)
 
   window.update()

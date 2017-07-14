@@ -1,7 +1,7 @@
 import glob
 from distutils.core import setup, Extension
 
-VERSION = '0.8.4'
+VERSION = '0.8.7'
 
 srcList = glob.glob('./src/*.c')
 module_ccircle = Extension(
@@ -28,7 +28,7 @@ module_ccircle = Extension(
 )
 
 setup(
-  name = 'CodingCircle Python Extensions',
+  name = 'CodingCircle Module',
   version = VERSION,
   url = 'http://coding.mathcircle.us',
   description = 'For use by students of the LSU Coding Circle program.',

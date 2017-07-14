@@ -6,33 +6,36 @@
 /* TODO : Free sound data */
 
 typedef struct {
-  DWORD chunkID;       // 0x46464952 "RIFF" in little endian
-  DWORD chunkSize;     // 4 + (8 + subChunk1Size) + (8 + subChunk2Size)
-  DWORD format;        // 0x45564157 "WAVE" in little endian
-
-  DWORD subChunk1ID;   // 0x20746d66 "fmt " in little endian
-  DWORD subChunk1Size; // 16 for PCM
-  WORD  audioFormat;   // 1 for PCM, 3 fot EEE floating point , 7 for μ-law
-  WORD  channels;      // 1 for mono, 2 for stereo
-  DWORD sampleRate;    // 8000, 22050, 44100, etc...
-  DWORD byteRate;      // sampleRate * channels * bitsPerSample/8
-  WORD  blockAlign;    // channels * bitsPerSample/8
-  WORD  bitsPerSample; // number of bits (8 for 8 bits, etc...)
-
-  DWORD subChunk2ID;   // 0x61746164 "data" in little endian
-  DWORD subChunk2Size; // numSamples * channels * bitsPerSample/8 (this is the actual data size in bytes)
-} WaveHeader;
-
-typedef struct {
   PyObject_HEAD
   int size;
   int capacity;
   char* data;
 } CC_Sound;
 
+typedef struct {
+  DWORD chunkID;
+  DWORD chunkSize;
+  DWORD format;
+
+  DWORD subChunk1ID;
+  DWORD subChunk1Size;
+  WORD  audioFormat;
+  WORD  channels;
+  DWORD sampleRate;
+  DWORD byteRate;
+  WORD  blockAlign;
+  WORD  bitsPerSample;
+
+  DWORD subChunk2ID;
+  DWORD subChunk2Size;
+} WaveHeader;
+
 typedef int16_t SampleType;
 const int Sample_Max = ((1 << (8 * (int)sizeof(SampleType) - 1)) - 1);
 
+/* -------------------------------------------------------------------------- */
+
+/* Convert a float to SampleType. Input is clamped to [-1, 1]. */
 inline SampleType FloatToSample (float x) {
   x *= Sample_Max;
   if (x >  Sample_Max) return  Sample_Max;
@@ -40,19 +43,24 @@ inline SampleType FloatToSample (float x) {
   return (SampleType)x;
 }
 
+/* Convert a time value in seconds to a sample index using SAMPLE_RATE. */
 inline static int SecToSample (float x) {
   return max(0, (int)(x * SAMPLE_RATE));
 }
 
+/* Return a pointer to the sound's sample buffer. */
 inline static SampleType* CC_Sound_GetSampleData ( CC_Sound* self ) {
   return (SampleType*)(self->data + sizeof(WaveHeader));
 }
 
+/* Double the capacity of the sound's sample buffer. */
 static void CC_Sound_Grow ( CC_Sound* self ) {
   self->capacity *= 2;
   self->data = realloc(self->data, sizeof(WaveHeader) + sizeof(SampleType) * self->capacity);
 }
 
+/* Ensure that the sound contains at least minSamples. Any samples that must be
+ * added to achieve the target will be initialized to 0. */
 static void CC_Sound_Extend ( CC_Sound* self, int minSamples ) {
   if (self->size >= minSamples)
     return;
@@ -88,7 +96,7 @@ static int CC_Sound_Init ( CC_Sound* self, PyObject* args ) {
   return 0;
 }
 
-/* -------------------------------------------------------------------------- */
+/* --- Sound.addSample ------------------------------------------------------ */
 
 static PyObject* CC_Sound_AddSample ( CC_Sound* self, PyObject* args ) {
   float fSample;
@@ -99,6 +107,8 @@ static PyObject* CC_Sound_AddSample ( CC_Sound* self, PyObject* args ) {
   CC_Sound_GetSampleData(self)[self->size++] = FloatToSample(fSample);
   Py_RETURN_NONE;
 }
+
+/* --- Sound.addSine -------------------------------------------------------- */
 
 static PyObject* CC_Sound_AddSine ( CC_Sound* self, PyObject* args) {
   float start, duration, freq, amp;
@@ -121,6 +131,8 @@ static PyObject* CC_Sound_AddSine ( CC_Sound* self, PyObject* args) {
   Py_RETURN_NONE;
 }
 
+/* --- Sound.getSample ------------------------------------------------------ */
+
 static PyObject* CC_Sound_GetSample ( CC_Sound* self, PyObject* args) {
   int index;
   if (!PyArg_ParseTuple(args, "i", &index))
@@ -130,6 +142,8 @@ static PyObject* CC_Sound_GetSample ( CC_Sound* self, PyObject* args) {
   return PyFloat_FromDouble(
     (double)CC_Sound_GetSampleData(self)[index] / (double)Sample_Max);
 }
+
+/* --- Sound.play ----------------------------------------------------------- */
 
 static PyObject* CC_Sound_Play ( CC_Sound* self, PyObject* args ) {
   WaveHeader* wav    = (WaveHeader*)self->data;
@@ -142,10 +156,10 @@ static PyObject* CC_Sound_Play ( CC_Sound* self, PyObject* args ) {
 /* -------------------------------------------------------------------------- */
 
 static PyMethodDef methods[] = {
-  { "addSample", (PyCFunction)CC_Sound_AddSample, METH_VARARGS, },
-  { "addSine", (PyCFunction)CC_Sound_AddSine, METH_VARARGS, },
-  { "getSample", (PyCFunction)CC_Sound_GetSample, METH_VARARGS, },
-  { "play", (PyCFunction)CC_Sound_Play, METH_VARARGS, },
+  { "addSample", (PyCFunction)CC_Sound_AddSample, METH_VARARGS, 0 },
+  { "addSine", (PyCFunction)CC_Sound_AddSine, METH_VARARGS, 0 },
+  { "getSample", (PyCFunction)CC_Sound_GetSample, METH_VARARGS, 0 },
+  { "play", (PyCFunction)CC_Sound_Play, METH_VARARGS, 0 },
   { 0 },
 };
 
@@ -189,6 +203,8 @@ static PyTypeObject CC_Sound_PyType = {
   0,                                  /* tp_alloc */
   0,                                  /* tp_new */
 };
+
+/* -------------------------------------------------------------------------- */
 
 void CC_Init_Sound ( PyObject* self ) {
   CC_Sound_PyType.tp_new = PyType_GenericNew;

@@ -14,7 +14,7 @@ if "%ARCH%"=="32" (
 )
 popd
 
-python build.py bdist_wininst --title="Coding Circle Python Extensions"
+python build.py bdist_wininst --title="CodingCircle Module"
 
 if "%INSTALL%"=="1" (
   copy %BUILDPATH%*.pyd %PYPATH%Lib\

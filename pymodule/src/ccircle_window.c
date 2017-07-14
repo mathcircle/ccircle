@@ -402,8 +402,6 @@ static PyMethodDef methods[] = {
   { 0 },
 };
 
-/* -------------------------------------------------------------------------- */
-
 static PyTypeObject CC_Window_PyType = {
   PyVarObject_HEAD_INIT(0, 0)
   "ccircle.Window",
