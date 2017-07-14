@@ -89,7 +89,7 @@ static PyObject* CC_Sound_AddSample ( CC_Sound* self, PyObject* args ) {
   Py_RETURN_NONE;
 }
 
-/* --- Sound.addSine --------------------------------------------------------- */
+/* --- Sound.addSaw --------------------------------------------------------- */
 
 static PyObject* CC_Sound_AddSaw ( CC_Sound* self, PyObject* args) {
   float start, duration, freq, amp;
@@ -111,7 +111,7 @@ static PyObject* CC_Sound_AddSaw ( CC_Sound* self, PyObject* args) {
   Py_RETURN_NONE;
 }
 
-/* --- Sound.addSine --------------------------------------------------------- */
+/* --- Sound.addSine -------------------------------------------------------- */
 
 static PyObject* CC_Sound_AddSine ( CC_Sound* self, PyObject* args) {
   float start, duration, freq, amp;
