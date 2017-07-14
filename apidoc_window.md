@@ -2,9 +2,6 @@
 
 ## [Back to Index](index)
 
-Here you will find functions related to creating and using on-screen windows,
-as well as drawing things inside windows.
-
 ## Class : ccircle.Window
 
 ## `ccircle.Window([title='CC Window', width=640, height=480]) -> new Window`
