@@ -57,12 +57,13 @@ static void CC_Image_Draw_With_UVs (
   float sx, float sy,
   float u1, float v1,
   float u2, float v2,
-  float angle )
+  float angle,
+  float r, float g, float b, float a)
 {
   GL_CHECK;
   glEnable(GL_TEXTURE_2D);
   glBindTexture(GL_TEXTURE_2D, self->handle);
-  glColor4f(1, 1, 1, 1);
+  glColor4f(r, g, b, a);
 
   glMatrixMode(GL_MODELVIEW);
   glPushMatrix();
@@ -88,10 +89,14 @@ static void CC_Image_Draw_With_UVs (
 static PyObject* CC_Image_Draw ( CC_Image* self, PyObject* args ) {
   float x, y, sx, sy;
   float angle = 0.0f;
-  if (!PyArg_ParseTuple(args, "ffff|f", &x, &y, &sx, &sy, &angle))
+  float r = 1.0f;
+  float g = 1.0f;
+  float b = 1.0f;
+  float a = 1.0f;
+  if (!PyArg_ParseTuple(args, "ffff|fffff", &x, &y, &sx, &sy, &angle, &r, &g, &b, &a))
     return 0;
 
-  CC_Image_Draw_With_UVs(self, x, y, sx, sy, 0.0f, 0.0f, 1.0f, 1.0f, angle);
+  CC_Image_Draw_With_UVs(self, x, y, sx, sy, 0.0f, 0.0f, 1.0f, 1.0f, angle, r, g, b, a);
   Py_RETURN_NONE;
 }
 
@@ -101,15 +106,19 @@ static PyObject* CC_Image_DrawSub ( CC_Image* self, PyObject* args ) {
   float x, y, sx, sy;
   float subX, subY, subSX, subSY;
   float angle = 0.0f;
-  if (!PyArg_ParseTuple(args, "ffffffff|f",
-       &x, &y, &sx, &sy, &subX, &subY, &subSX, &subSY, &angle))
+  float r = 1.0f;
+  float g = 1.0f;
+  float b = 1.0f;
+  float a = 1.0f;
+  if (!PyArg_ParseTuple(args, "ffffffff|fffff",
+       &x, &y, &sx, &sy, &subX, &subY, &subSX, &subSY, &angle, &r, &g, &b, &a))
     return 0;
 
   float u1 = subX / self->sx;
   float v1 = subY / self->sy;
   float u2 = (subX + subSX) / self->sx;
   float v2 = (subY + subSY) / self->sy;
-  CC_Image_Draw_With_UVs(self, x, y, sx, sy, u1, v1, u2, v2, angle);
+  CC_Image_Draw_With_UVs(self, x, y, sx, sy, u1, v1, u2, v2, angle, r, g, b, a);
   Py_RETURN_NONE;
 }
 
