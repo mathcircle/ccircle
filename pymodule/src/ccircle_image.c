@@ -16,16 +16,20 @@ static int CC_Image_Init ( CC_Image* self, PyObject* args ) {
   if (!PyArg_ParseTuple(args, "s", &path))
     return -1;
 
+  FILE* file = fopen(path, "r");
+  if (!file)
+    Fatal("Failed to load image: file does not exist");
+  fclose(file);
+
   int channels;
   uchar* data = CC_Image_Load(path, &self->sx, &self->sy, &channels);
   if (!data)
-    return -1;
+    Fatal("Failed to load image: unsupported image format");
 
-  if (channels != 3 && channels != 4) {
-    Fatal("Image type unsupported: must have 3 or 4 channels");
-    return -1;
-  }
+  if (channels != 3 && channels != 4)
+    Fatal("Failed to load image: unsupported channel format (only 3 or 4 channels supported)");
 
+  GL_CHECK;
   glGenTextures(1, &self->handle);
   glBindTexture(GL_TEXTURE_2D, self->handle);
   glPixelStorei(GL_PACK_ALIGNMENT, 1);
@@ -33,13 +37,16 @@ static int CC_Image_Init ( CC_Image* self, PyObject* args ) {
   glTexImage2D(GL_TEXTURE_2D,
     0,
     GL_RGBA8,
-    self->sx, self->sy, 0,
+    self->sx,
+    self->sy,
+    0,
     channels == 3 ? GL_RGB : GL_RGBA,
     GL_UNSIGNED_BYTE,
     data);
 
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  GL_CHECK;
   CC_Image_Free(data);
   return 0;
 }
@@ -52,6 +59,7 @@ static void CC_Image_Draw_With_UVs (
   float u2, float v2,
   float angle )
 {
+  GL_CHECK;
   glEnable(GL_TEXTURE_2D);
   glBindTexture(GL_TEXTURE_2D, self->handle);
   glColor4f(1, 1, 1, 1);
@@ -72,6 +80,7 @@ static void CC_Image_Draw_With_UVs (
 
   glPopMatrix();
   glDisable(GL_TEXTURE_2D);
+  GL_CHECK;
 }
 
 /* --- Image.draw ----------------------------------------------------------- */

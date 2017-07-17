@@ -22,6 +22,9 @@ bool   CC_GLContext_Exists ( void );
 uchar* CC_Image_Load       ( cstr path, int* sx, int* sy, int* chan );
 void   CC_Image_Free       ( uchar* );
 
+void   CC_GL_CheckError    ( char const* file, int line );
+#define GL_CHECK CC_GL_CheckError(__FILE__, __LINE__)
+
 void Fatal (cstr s);
 
 #define Tau 6.28318531

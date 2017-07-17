@@ -17,6 +17,27 @@ void Fatal ( cstr s ) {
   exit(0);
 }
 
+void CC_GL_CheckError ( char const* file, int line ) {
+  GLenum e = glGetError();
+  char const* eStr = 0;
+  switch (e) {
+    case GL_INVALID_ENUM:
+      eStr = "GL_INVALID_ENUM"; break;
+    case GL_INVALID_VALUE:
+      eStr = "GL_INVALID_VALUE"; break;
+    case GL_INVALID_OPERATION:
+      eStr = "GL_INVALID_OPERATION"; break;
+    case GL_OUT_OF_MEMORY:
+      eStr = "GL_OUT_OF_MEMORY"; break;
+  }
+
+  if (eStr) {
+    char buff[256];
+    snprintf(buff, sizeof(buff), "[%s:%d] OpenGL Error: %s", file, line, eStr);
+    Fatal(buff);
+  }
+}
+
 PyMODINIT_FUNC
 PyInit_ccircle ( void ) {
   PyObject* self = PyModule_Create(&ccircle_module);

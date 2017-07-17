@@ -49,6 +49,7 @@ static PyObject* ccircle_font_draw ( ccircle_font_t* self, PyObject* args ) {
   int y = (int)fy;
   int size = (int)fsize;
 
+  GL_CHECK;
   FT_Set_Pixel_Sizes(self->face, 0, 2 * size);
   FT_GlyphSlot slot = self->face->glyph;
   for (cstr pText = text; *pText; ++pText) {
@@ -72,6 +73,7 @@ static PyObject* ccircle_font_draw ( ccircle_font_t* self, PyObject* args ) {
     glEnd();
     x += slot->advance.x >> 6;
   }
+  GL_CHECK;
 
   Py_RETURN_NONE;
 }

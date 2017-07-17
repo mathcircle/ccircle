@@ -120,12 +120,14 @@ static int CC_Window_Init ( CC_Window* self, PyObject* args, PyObject* kwds ) {
   ShowWindow(hwnd, SW_SHOW);
   UpdateWindow(hwnd);
 
+  GL_CHECK;
   glEnable(GL_POINT_SMOOTH);
   glEnable(GL_LINE_SMOOTH);
   glHint(GL_POINT_SMOOTH_HINT, GL_NICEST);
   glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
   glPointSize(2.0);
   glLineWidth(1.0);
+  GL_CHECK;
 
   self->hwnd = hwnd;
   self->hglc = hglc;
@@ -140,6 +142,7 @@ bool CC_GLContext_Exists ( void ) {
 static void CC_Window_SetViewport ( CC_Window* self ) {
   RECT vp;
   GetClientRect(self->hwnd, &vp);
+  GL_CHECK;
   glViewport(vp.left, vp.top, vp.right - vp.left, vp.bottom - vp.top);
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
@@ -147,6 +150,7 @@ static void CC_Window_SetViewport ( CC_Window* self ) {
   glScaled(2.0 / (vp.right - vp.left), -2.0 / (vp.bottom - vp.top), 1.0);
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
+  GL_CHECK;
 }
 
 static void CC_Window_SetActive ( CC_Window* self ) {
@@ -168,8 +172,10 @@ static PyObject* CC_Window_Clear ( CC_Window* self, PyObject* args ) {
 
   CC_Window_SetActive(self);
   CC_Window_SetViewport(self);
+  GL_CHECK;
   glClearColor(r, g, b, 1);
   glClear(GL_COLOR_BUFFER_BIT);
+  GL_CHECK;
   Py_RETURN_NONE;
 }
 
@@ -190,6 +196,7 @@ static PyObject* CC_Window_DrawCircle ( CC_Window* self, PyObject* args ) {
   int verts = (int)fv;
   fv = (float)verts;
 
+  GL_CHECK;
   glBegin(GL_TRIANGLES);
   glColor4f(r, g, b, a);
   for (int i = 0; i < verts; ++i) {
@@ -200,6 +207,7 @@ static PyObject* CC_Window_DrawCircle ( CC_Window* self, PyObject* args ) {
     glVertex2f(x + radius * cos(angle2), y + radius * sin(angle2));
   }
   glEnd();
+  GL_CHECK;
   Py_RETURN_NONE;
 }
 
@@ -216,12 +224,14 @@ static PyObject* CC_Window_DrawLine ( CC_Window* self, PyObject* args ) {
     return 0;
 
   CC_Window_SetActive(self);
+  GL_CHECK;
   glLineWidth(w);
   glColor4f(r, g, b, a);
   glBegin(GL_LINES);
   glVertex2f(x1, y1);
   glVertex2f(x2, y2);
   glEnd();
+  GL_CHECK;
   Py_RETURN_NONE;
 }
 
@@ -238,11 +248,13 @@ static PyObject* CC_Window_DrawPoint ( CC_Window* self, PyObject* args ) {
     return 0;
 
   CC_Window_SetActive(self);
+  GL_CHECK;
   glPointSize(s);
   glColor4f(r, g, b, a);
   glBegin(GL_POINTS);
   glVertex2f(x, y);
   glEnd();
+  GL_CHECK;
   Py_RETURN_NONE;
 }
 
@@ -258,6 +270,7 @@ static PyObject* CC_Window_DrawRect ( CC_Window* self, PyObject* args ) {
     return 0;
 
   CC_Window_SetActive(self);
+  GL_CHECK;
   glColor4f(r, g, b, a);
   glBegin(GL_QUADS);
   glVertex2f(x, y);
@@ -265,6 +278,7 @@ static PyObject* CC_Window_DrawRect ( CC_Window* self, PyObject* args ) {
   glVertex2f(x + sx, y + sy);
   glVertex2f(x, y + sy);
   glEnd();
+  GL_CHECK;
   Py_RETURN_NONE;
 }
 
@@ -282,12 +296,14 @@ static PyObject* CC_Window_DrawTri ( CC_Window* self, PyObject* args ) {
     return 0;
 
   CC_Window_SetActive(self);
+  GL_CHECK;
   glColor4f(r, g, b, a);
   glBegin(GL_TRIANGLES);
   glVertex2f(x1, y1);
   glVertex2f(x2, y2);
   glVertex2f(x3, y3);
   glEnd();
+  GL_CHECK;
   Py_RETURN_NONE;
 }
 
@@ -370,6 +386,7 @@ static PyObject* CC_Window_Update ( CC_Window* self, PyObject* args ) {
     }
   }
 
+  GL_CHECK;
   HDC dc = GetDC(self->hwnd);
   wglMakeCurrent(dc, self->hglc);
   SwapBuffers(dc);
@@ -378,6 +395,7 @@ static PyObject* CC_Window_Update ( CC_Window* self, PyObject* args ) {
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   ReleaseDC(self->hwnd, dc);
+  GL_CHECK;
 
   Py_RETURN_NONE;
 }
