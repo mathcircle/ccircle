@@ -61,26 +61,14 @@ static void CC_Font_GetTextSize_Impl ( CC_Font* self, cstr text, int size, int* 
   *sy = (maxY - minY + 1);
 }
 
-/* --- Font.draw ------------------------------------------------------------ */
-
-static PyObject* CC_Font_Draw ( CC_Font* self, PyObject* args ) {
+static void CC_Font_Draw_Impl (
+  CC_Font* self,
+  cstr text,
+  int x, int y, int size,
+  float r, float b, float g, float a)
+{
   if (!CC_GLContext_Exists())
     Fatal("A window must be created before text can be drawn");
-
-  cstr text;
-  float fx, fy;
-  float fsize = DEFAULT_FONT_SIZE;
-  float r = 1.0f;
-  float g = 1.0f;
-  float b = 1.0f;
-  float a = 1.0f;
-  
-  if (!PyArg_ParseTuple(args, "sff|fffff", &text, &fx, &fy, &fsize, &r, &g, &b, &a))
-    return 0;
-
-  int x = (int)fx;
-  int y = (int)fy;
-  int size = (int)fsize;
 
   GL_CHECK;
   FT_Set_Pixel_Sizes(self->face, 0, 2 * size);
@@ -95,7 +83,7 @@ static PyObject* CC_Font_Draw ( CC_Font* self, PyObject* args ) {
       for (uint dx = 0; dx < slot->bitmap.width; ++dx) {
         int drawX = ox + dx;
         int drawY = oy + dy;
-        glColor4f(r, g, b, a * sqrt((float)(pBitmap[dx] / 255.0f)));
+        glColor4f(r, g, b, (float)(a * sqrt((float)(pBitmap[dx] / 255.0f))));
         glVertex2i(drawX + 0, drawY + 0);
         glVertex2i(drawX + 0, drawY + 1);
         glVertex2i(drawX + 1, drawY + 1);
@@ -107,9 +95,38 @@ static PyObject* CC_Font_Draw ( CC_Font* self, PyObject* args ) {
     x += slot->advance.x >> 6;
   }
   GL_CHECK;
+}
 
+/* --- Font.draw ------------------------------------------------------------ */
+
+static PyObject* CC_Font_Draw ( CC_Font* self, PyObject* args ) {
+  cstr text;
+  float fx, fy;
+  float fsize = DEFAULT_FONT_SIZE;
+  float r = 1.0f, g = 1.0f, b = 1.0f, a = 1.0f;
+  if (!PyArg_ParseTuple(args, "sff|fffff", &text, &fx, &fy, &fsize, &r, &g, &b, &a))
+    return 0;
+
+  CC_Font_Draw_Impl(self, text, (int)fx, (int)fy, (int)fsize, r, g, b, a);
   Py_RETURN_NONE;
 }
+
+/* --- Font.drawCentered ---------------------------------------------------- */
+
+static PyObject* CC_Font_DrawCentered ( CC_Font* self, PyObject* args ) {
+  cstr text;
+  float fx, fy;
+  float fsize = DEFAULT_FONT_SIZE;
+  float r = 1.0f, g = 1.0f, b = 1.0f, a = 1.0f;
+  if (!PyArg_ParseTuple(args, "sff|fffff", &text, &fx, &fy, &fsize, &r, &g, &b, &a))
+    return 0;
+
+  int sx, sy;
+  CC_Font_GetTextSize_Impl(self, text, (int)fsize, &sx, &sy);
+  CC_Font_Draw_Impl(self, text, (int)fx - sx / 2, (int)fy + sy / 2, (int)fsize, r, g, b, a);
+  Py_RETURN_NONE;
+}
+
 
 /* --- Font.getTextSize ----------------------------------------------------- */
 
@@ -129,6 +146,7 @@ static PyObject* CC_Font_GetTextSize ( CC_Font* self, PyObject* args ) {
 
 static PyMethodDef methods[] = {
   { "draw", (PyCFunction)CC_Font_Draw, METH_VARARGS, 0 },
+  { "drawCentered", (PyCFunction)CC_Font_DrawCentered, METH_VARARGS, 0 },
   { "getTextSize", (PyCFunction)CC_Font_GetTextSize, METH_VARARGS, 0 },
   { 0 },
 };

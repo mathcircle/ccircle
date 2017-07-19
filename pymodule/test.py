@@ -30,9 +30,9 @@ while window.isOpen():
   cx, cy = cat.getSize()
   cat.drawSub(128, 32, 128, 128, cx / 4, cy / 4, cx / 8, cy / 8, -t)
   if ccircle.isKeyDown('1'):
-    font.draw("I'm a cat! :3", 140, 64 + 32, 12)
+    font.drawCentered("I'm a cat! :3", mx, my, 20)
 
-  if ccircle.isButtonDown('left'):
+  if ccircle.wasKeyPressed('left'):
     cat = ccircle.Image('res/cat.png')
     cat.eraseRed()
     cat.recolor(0.8, 0.8, 0.8, random.uniform(0, 1), random.uniform(0, 1), random.uniform(0, 1), 0.3)
