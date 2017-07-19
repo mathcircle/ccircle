@@ -32,8 +32,20 @@
     img.drawSub(x, y, 256, 256, 0, 256, 256, 256)   # Draws the bottom-left sub-image
     img.drawSub(x, y, 256, 256, 256, 256, 256, 256) # Draws the bottom-right sub-image
 
-## `image.getPixel(x, y) -> (r, g, b)`
-  Return the color of the image pixel `(x, y)` as a red, green, blue tuple.
+## `image.eraseRed() -> None`
+  Erases every pixel that is pure red, turning that pixel fully-transparent.
+
+## `image.eraseGreen() -> None`
+  Erases every pixel that is pure green, turning that pixel fully-transparent.
+
+## `image.eraseBlue() -> None`
+  Erases every pixel that is pure blue, turning that pixel fully-transparent.
+
+## `image.eraseWhite() -> None`
+  Erases every pixel that is pure white, turning that pixel fully-transparent.
+
+## `image.getPixel(x, y) -> (r, g, b, a)`
+  Return the color of the image pixel `(x, y)` as a red, green, blue, alpha tuple.
   The pixel coordinates must be in-bounds:
 
     0 <= x < image.width
@@ -41,4 +53,8 @@
 
 ## `image.getSize() -> (width, height)`
   Return the size of the image in pixels.
+
+## `image.recolor(r0, g0, b0, r1, g1, b1, [tolerance=1.0/128.0]) -> None`
+  Modify the image such that every pixel within a maximum of `tolerance` shades
+  of `(r0, g0, b0)` is recolored to `(r1, g1, b1)`.
 

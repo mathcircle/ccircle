@@ -1,7 +1,7 @@
 import glob
 from distutils.core import setup, Extension
 
-VERSION = '0.9.1'
+VERSION = '0.9.6'
 
 srcList = glob.glob('./src/*.c')
 module_ccircle = Extension(

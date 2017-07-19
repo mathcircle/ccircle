@@ -12,3 +12,7 @@
   `(x, y)` and with color `(r, g, b)`.
 
   _NOTE: Drawing text requires that you have a window open!_
+
+## `font.getTextSize(text, [size=10]) -> (width, height)`
+  Return the width and height, in pixels, of the region that would be occupied
+  by `text` if drawn with this font at size `size`.

@@ -26,6 +26,11 @@ LRESULT CALLBACK CC_Window_Proc ( HWND self, UINT msg, WPARAM wp, LPARAM lp ) {
         DestroyWindow(self);
         break;
       }
+      CC_SetKeyState((int)wp, true);
+      return DefWindowProc(self, msg, wp, lp);
+
+    case WM_KEYUP:
+      CC_SetKeyState((int)wp, false);
       return DefWindowProc(self, msg, wp, lp);
 
     default:
@@ -374,6 +379,7 @@ static PyObject* CC_Window_ToggleMaximized ( CC_Window* self, PyObject* args ) {
 /* --- Window::update ------------------------------------------------------- */
 
 static PyObject* CC_Window_Update ( CC_Window* self, PyObject* args ) {
+  CC_Keyboard_Update();
   MSG msg;
   while (PeekMessage(&msg, 0, 0, 0, PM_REMOVE)) {
     if (msg.message == WM_QUIT) {
@@ -383,6 +389,7 @@ static PyObject* CC_Window_Update ( CC_Window* self, PyObject* args ) {
     } else {
       TranslateMessage(&msg);
       DispatchMessage(&msg);
+      break;
     }
   }
 
