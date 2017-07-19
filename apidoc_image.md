@@ -32,6 +32,13 @@
     img.drawSub(x, y, 256, 256, 0, 256, 256, 256)   # Draws the bottom-left sub-image
     img.drawSub(x, y, 256, 256, 256, 256, 256, 256) # Draws the bottom-right sub-image
 
+## `image.getPixel(x, y) -> (r, g, b)`
+  Return the color of the image pixel `(x, y)` as a red, green, blue tuple.
+  The pixel coordinates must be in-bounds:
+
+    0 <= x < image.width
+    0 <= y < image.height
+
 ## `image.getSize() -> (width, height)`
-  Returns the size of the image in pixels.
+  Return the size of the image in pixels.
 

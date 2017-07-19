@@ -1,16 +1,27 @@
 #include "ccircle.h"
+#include <structmember.h>
 
-/* TODO : Free gl handle */
+typedef struct {
+  float r, g, b, a;
+} RGBA;
 
 typedef struct {
   PyObject_HEAD
   uint handle;
   int sx, sy;
+  RGBA* data;
 } CC_Image;
+
+static void CC_Image_Dealloc( CC_Image* self ) {
+  glDeleteTextures(1, &self->handle);
+  free(self->data);
+  self->data = 0;
+  Py_TYPE(self)->tp_free((PyObject*)self);
+}
 
 static int CC_Image_Init ( CC_Image* self, PyObject* args ) {
   if (!CC_GLContext_Exists())
-    Fatal("A window must be created before images can be loaded");
+    Fatal("Image.__init__: A window must be created before images can be loaded");
 
   cstr path;
   if (!PyArg_ParseTuple(args, "s", &path))
@@ -18,16 +29,16 @@ static int CC_Image_Init ( CC_Image* self, PyObject* args ) {
 
   FILE* file = fopen(path, "r");
   if (!file)
-    Fatal("Failed to load image: file does not exist");
+    Fatal("Image.__init__: Failed to load image (file does not exist)");
   fclose(file);
 
   int channels;
   uchar* data = CC_Image_Load(path, &self->sx, &self->sy, &channels);
   if (!data)
-    Fatal("Failed to load image: unsupported image format");
+    Fatal("Image.__init__: Failed to load image (unsupported image format)");
 
   if (channels != 3 && channels != 4)
-    Fatal("Failed to load image: unsupported channel format (only 3 or 4 channels supported)");
+    Fatal("Image.__init__: Failed to load image (unsupported channel format -- only 3 or 4 channels supported)");
 
   GL_CHECK;
   glGenTextures(1, &self->handle);
@@ -43,6 +54,9 @@ static int CC_Image_Init ( CC_Image* self, PyObject* args ) {
     channels == 3 ? GL_RGB : GL_RGBA,
     GL_UNSIGNED_BYTE,
     data);
+
+  self->data = malloc(self->sx * self->sy * sizeof(RGBA));
+  glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_FLOAT, self->data);
 
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -122,6 +136,19 @@ static PyObject* CC_Image_DrawSub ( CC_Image* self, PyObject* args ) {
   Py_RETURN_NONE;
 }
 
+/* --- Image.getPixel ------------------------------------------------------- */
+
+static PyObject* CC_Image_GetPixel( CC_Image* self, PyObject* args) {
+  int x, y;
+  if (!PyArg_ParseTuple(args, "ii", &x, &y))
+    return 0;
+  if (x < 0 || y < 0 || x >= self->sx || y >= self->sy)
+    Fatal("Image.getPixel: Pixel coordinates are out-of-bounds");
+
+  RGBA* c = self->data + self->sx * y + x;
+  return Py_BuildValue("(ffff)", c->r, c->g, c->b, c->a);
+}
+
 /* --- Image.getSize -------------------------------------------------------- */
 
 static PyObject* CC_Image_GetSize( CC_Image* self, PyObject* args ) {
@@ -129,6 +156,12 @@ static PyObject* CC_Image_GetSize( CC_Image* self, PyObject* args ) {
 }
 
 /* -------------------------------------------------------------------------- */
+
+static PyMemberDef members[] = {
+    { "width", T_FLOAT, offsetof(CC_Image, sx), 0, "image width in pixels" },
+    { "height", T_FLOAT, offsetof(CC_Image, sy), 0, "image height in pixels" },
+    { 0 },
+};
 
 static PyMethodDef methods[] = {
   { "draw", (PyCFunction)CC_Image_Draw, METH_VARARGS, 0 },
@@ -142,7 +175,7 @@ static PyTypeObject CC_Image_PyType = {
   "ccircle.Image",
   sizeof(CC_Image),
   0,                                  /* tp_itemsize */
-  0,                                  /* tp_dealloc */
+  (destructor)CC_Image_Dealloc,       /* tp_dealloc */
   0,                                  /* tp_print */
   0,                                  /* tp_getattr */
   0,                                  /* tp_setattr */
@@ -166,7 +199,7 @@ static PyTypeObject CC_Image_PyType = {
   0,                                  /* tp_iter */
   0,                                  /* tp_iternext */
   methods,                            /* tp_methods */
-  0,                                  /* tp_members */
+  members,                            /* tp_members */
   0,                                  /* tp_getset */
   0,                                  /* tp_base */
   0,                                  /* tp_dict */
