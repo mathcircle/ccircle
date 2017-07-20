@@ -65,7 +65,7 @@ static void CC_Font_Draw_Impl (
   CC_Font* self,
   cstr text,
   int x, int y, int size,
-  float r, float b, float g, float a)
+  float r, float g, float b, float a)
 {
   if (!CC_GLContext_Exists())
     Fatal("A window must be created before text can be drawn");
