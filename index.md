@@ -14,7 +14,7 @@
 
 # CCircle Module Download
 
-### [CCircle v0.9.7 (Win64)](https://github.com/mathcircle/ccircle/raw/master/pymodule/dist/CodingCircle%20Module-0.9.7.win-amd64-py3.6.exe)
+### [CCircle v0.9.8 (Win64)](https://github.com/mathcircle/ccircle/raw/master/pymodule/dist/CodingCircle%20Module-0.9.8.win-amd64-py3.6.exe)
 
 # Setup
    First-day setup guide for installing a Python coding environment and setting

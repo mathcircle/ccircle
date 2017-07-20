@@ -37,8 +37,8 @@ static int CC_Image_Init ( CC_Image* self, PyObject* args ) {
   if (!data)
     Fatal("Image.__init__: Failed to load image (unsupported image format)");
 
-  if (channels != 3 && channels != 4)
-    Fatal("Image.__init__: Failed to load image (unsupported channel format -- only 3 or 4 channels supported)");
+  if (channels == 2)
+    Fatal("Image.__init__: Failed to load image (2-channel images are not supported)");
 
   GL_CHECK;
   glGenTextures(1, &self->handle);
@@ -51,7 +51,9 @@ static int CC_Image_Init ( CC_Image* self, PyObject* args ) {
     self->sx,
     self->sy,
     0,
-    channels == 3 ? GL_RGB : GL_RGBA,
+    channels == 4 ? GL_RGBA :
+    channels == 3 ? GL_RGB :
+                    GL_RED,
     GL_UNSIGNED_BYTE,
     data);
 
