@@ -1,9 +1,5 @@
 from splash_window import *
 
-import inspect
-
-all_functions = inspect.getmembers(glfw, inspect.isfunction)
-
 # Open Window.
 win = Window()
 
