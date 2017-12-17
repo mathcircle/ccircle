@@ -8,7 +8,7 @@ class Window:
     """Window class powered by GLFW. Provides 'wrapper' function calls to circumvent confusing GLFW
             and GL nuances for a more intuitive end-user experience. """
 
-    def __init__(self, width=960, height=520, win_title="Splash Window", fullscreen=False):
+    def __init__(self, width=1920, height=1080, win_title="Splash Window", fullscreen=False):
         """Create window, set context and register input callbacks."""
         if not glfw.init():
             raise RuntimeError(
@@ -16,6 +16,9 @@ class Window:
 
         monitor = glfw.get_primary_monitor() if fullscreen else None
         self.win = glfw.create_window(width=width, height=height, title=win_title, monitor=monitor)
+        if not self.win:
+            raise RuntimeError('Could not create a GLFW Window. Ask Brendan for help.')
+        self._set_active()
 
         glEnable(GL_POINT_SMOOTH)
         glEnable(GL_LINE_SMOOTH)
