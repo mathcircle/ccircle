@@ -1,38 +1,52 @@
-from splash import *
-import splash_window_input as input
+from cc import *
+from cc.window_input import RegisterInputFunctionality
+
 
 class Window:
-    """Window class powered by GLFW. Provides 'wrapper' function calls to circumvent confusing GLFW and GL nuances
-        for a more intuitive end-user experience.
+    """ Window class powered by GLFW.
+        Provides intuitive 'wrapper' function calls to circumvent confusing GLFW and GL nuances.
+
+    Args:
+        width (int, optional): Width in pixels of the GLFW window.
+        height (int, optional): Height in pixels of the GLFW window.
+        win_title (str, optional): The title of the window.
+        fullscreen (bool, optional): if the window should be fullscreen.
     """
+
     def __init__(self, width=960, height=520, win_title="Splash Window", fullscreen=False):
         """Create window, set context and register input callbacks."""
         monitor = glfw.get_primary_monitor() if fullscreen else None
-        self.win = glfw.create_window(width=width, height=height, title=win_title, monitor=monitor)
-        input.Input(self.win)
+        self.win = glfw.create_window(width=width, height=height, title=win_title, monitor=monitor, share=None)
+        RegisterInputFunctionality(self.win)
 
     """ PUBLIC FUNCTIONS """
+
     def isOpen(self):
-        return not glfw.core.window_should_close(self.win)
+        """ Returns whether or not this window is open.
+
+        Returns:
+            True if open, False otherwise.
+        """
+        return not glfw.window_should_close(self.win)
 
     def get_top_left_corner(self):
-        """Gets the coordinates of the top left corner of the window.
+        """ Gets the coordinates of the top left corner of the window.
 
         Returns:
             (top_left_x, top_left_y): The .
-                """
+        """
         return tuple(glfw.get_window_pos(self.win))
 
     def get_size(self):
-        """Gets the size of the window.
+        """ Gets the size of the window.
 
         Returns:
             (width, height): The size of the window.
-                """
+        """
         return tuple(glfw.get_window_size(self.win))
 
     def get_mouse_pos(self):
-        """The coordinates of the mouse position with respect to the top-left corner of the window.
+        """ The coordinates of the mouse position with respect to the top-left corner of the window.
 
         Returns:
             (x, y): A tuple of the mouse position.
@@ -49,9 +63,10 @@ class Window:
         glfw.destroy_window(self.win)
 
     """ PUBLIC STATIC FUNCTIONS """
+
     @staticmethod
     def draw_circle(x, y, radius, r=1.0, g=1.0, b=1.0, a=1.0):
-        """Draws a circle centered at (x, y).
+        """ Draws a circle centered at (x, y).
 
         Notes:
             Parameters in pixels.
@@ -82,11 +97,12 @@ class Window:
 
     @staticmethod
     def close_all_windows():
-        glfw.core.terminate()
+        glfw.terminate()
 
     """ PRIVATE FUNCTIONS """
+
     def _set_active(self):
-        glfw.core.make_context_current(self.win)
+        glfw.make_context_current(self.win)
 
     def _set_viewport(self):
         (fb_width, fb_height) = tuple(glfw.get_framebuffer_size(self.win))
@@ -100,10 +116,9 @@ class Window:
         gl.glLoadIdentity()
 
     def update(self):
-        glfw.core.poll_events()
-        glfw.core.swap_buffers(self.win)
+        glfw.poll_events()
+        glfw.swap_buffers(self.win)
         gl.glClearColor(0, 0, 0, 1)
         gl.glClear(gl.GL_COLOR_BUFFER_BIT)
         gl.glEnable(gl.GL_BLEND)
         gl.glBlendFunc(gl.GL_SRC_ALPHA, gl.GL_ONE_MINUS_SRC_ALPHA)
-

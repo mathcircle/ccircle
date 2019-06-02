@@ -1,3 +1,4 @@
+""" The one-stop-shop for all imports ccircle. """
 import math
 
 import glfw

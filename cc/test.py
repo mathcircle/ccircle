@@ -1,4 +1,6 @@
-from splash_window import *
+""" Example based off of http://cegui.org.uk/wiki/Using_PyCEGUI_with_glfw3_and_PyOpenGL_(0.8)"""
+
+from cc.window import Window
 
 # Open Window.
 win = Window()
